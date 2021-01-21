@@ -2,7 +2,9 @@ import React, {Component} from 'react';
 
 import {BrowserRouter, Switch, Route} from 'react-router-dom';
 
-import IndexPage from './pages/IndexPage';
+import AttendancePage from './pages/AttendancePage';
+import MemberPage from "./pages/MemberPage";
+import EventPage from "./pages/EventPage";
 
 
 class MainRouter extends Component {
@@ -11,8 +13,9 @@ class MainRouter extends Component {
     return (
       <BrowserRouter>
         <Switch>
-          <Route exact path={"/"} component={IndexPage} />
-          <Route path={"/"} component={IndexPage} />
+          <Route exact path={"/event"} component={EventPage} />
+          <Route path={"/member"} component={MemberPage} />
+          <Route path={"/attendance"} component={AttendancePage} />
         </Switch>
       </BrowserRouter>
     );

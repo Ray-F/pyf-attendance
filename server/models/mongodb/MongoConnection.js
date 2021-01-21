@@ -1,5 +1,5 @@
 const MongoClient = require('mongodb').MongoClient;
-const config = require('../utils/config');
+const config = require('../../utils/config');
 
 const client = new MongoClient(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -10,5 +10,6 @@ client.connect(err => {
     console.log("SERVER_LOG: Mongodb Connected")
   }
 });
+
 
 module.exports = client;
