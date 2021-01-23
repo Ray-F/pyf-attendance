@@ -1,60 +1,134 @@
 const mongoClient = require('./MongoConnection')
 const ObjectId = require('mongodb').ObjectId
 
+
+const memberCollection = () => {
+  return mongoClient.db("pyf-attendance").collection("members")
+}
+
+const eventCollection = () => {
+  return mongoClient.db("pyf-attendance").collection("events")
+}
+
+const attendanceCollection = () => {
+  return mongoClient.db("pyf-attendance").collection("attendance")
+}
+
 /**
  * Database access functions – depending on the parameters passed, this will determine the search return.
  *
- * getMembersFromDb
- * getEventsFromDb
- * getAttendanceFromDb
  */
 const getMembersFromDb = async (memberId = null) => {
-  const memberCollection = mongoClient.db("pyf-attendance").collection("members");
-
-  if (memberId) {
-    return await memberCollection.findOne({ "_id": ObjectId(memberId) }).toObject();
-  } else {
-    return await memberCollection.find({}).toArray();
-  }
+  if (memberId) return await memberCollection().findOne({ "_id": ObjectId(memberId) }).toObject();
+  return await memberCollection().find({}).toArray();
 }
 
-const getEventsFromDb = async (eventId = null) => {
-  const eventCollection = mongoClient.db("pyf-attendance").collection("events");
+/**
+ * Saves a member to the database
+ * TODO: Change to update member with upsert on. Make member return with object ID
+ */
+const saveMemberToDb = async (memberObject) => {
+  return await memberCollection().insertOne(memberObject)
+}
 
-  if (eventId) {
-    return await eventCollection.findOne({ "_id": ObjectId(eventId) });
-  } else {
-    return await eventCollection.find({}).toArray()
+const deleteMemberFromDb = async (memberId) => {
+  const query = {
+    "_id": {
+      $eq: ObjectId(memberId)
+    }
   }
+
+  return await memberCollection().deleteOne(query)
+}
+
+const deleteAllMembersFromDb = async () => {
+  return await memberCollection().deleteMany({})
+}
+
+/**
+ * Gets all events from database.
+ */
+const getEventsFromDb = async (eventId = null) => {
+  if (eventId) return await eventCollection().findOne({ "_id": ObjectId(eventId) });
+  return await eventCollection().find({}).toArray()
 }
 
 const saveEventToDb = async (eventObject) => {
-  const eventCollection = mongoClient.db("pyf-attendance").collection("events");
-  const res = eventCollection.insertOne(eventObject)
+  return await eventCollection().insertOne(eventObject)
 }
 
-const getAttendanceFromDb = async (eventId = null, memberId = null) => {
-  const attendanceCollection = mongoClient.db("pyf-attendance").collection("attendance")
-
-  let queriedResult
-
-  if (eventId) {
-    queriedResult = await attendanceCollection.find({ "event.eventId": ObjectId(eventId) }).toArray()
-  } else if (memberId) {
-    queriedResult = await attendanceCollection.find({ "member.memberId": ObjectId(memberId) }).toArray()
-  } else {
-    queriedResult = await attendanceCollection.find({}).toArray()
+const deleteEventFromDb = async (eventId) => {
+  const query = {
+    "_id": {
+      $eq: ObjectId(eventId)
+    }
   }
 
-  return queriedResult
+  return await eventCollection().deleteOne(query)
+}
+
+const deleteAllEventsFromDb = async () => {
+  return await eventCollection().deleteMany({})
+}
+
+const setEventRecorded = async (eventId = null, recorded = true) => {
+  const query = {
+    $set: { hasAttendanceRecords: recorded }
+  }
+
+  if (eventId) {
+    const filter = { _id: ObjectId(eventId) }
+    return await eventCollection().updateOne(filter, query)
+  }
+
+  return await eventCollection().updateMany({}, query)
+}
+
+/**
+ * Attendance functions.
+ */
+const getAttendanceFromDb = async (eventId = null, memberId = null) => {
+  if (eventId) {
+    return await attendanceCollection().find({ "event.eventId": ObjectId(eventId) }).toArray()
+  } else if (memberId) {
+    return await attendanceCollection().find({ "member.memberId": ObjectId(memberId) }).toArray()
+  } else {
+    return await attendanceCollection().find({}).toArray()
+  }
 }
 
 const saveAttendanceToDb = async (recordsArray) => {
-  const attendanceCollection = mongoClient.db("pyf-attendance").collection("attendance")
+  return await attendanceCollection().insertMany(recordsArray)
+}
 
-  const res = attendanceCollection.insertMany(recordsArray)
+const deleteAttendanceFromDb = async (eventId = null, memberId = null) => {
+  let query
+
+  if (eventId) {
+    query = {
+      "event.eventId": {
+        $eq: ObjectId(eventId)
+      }
+    }
+  } else if (memberId) {
+    query = {
+      "member.memberId": {
+        $eq: ObjectId(memberId)
+      }
+    }
+  } else {
+    throw new Error("IllegalArgumentException: Unspecified event or member Id to delete attendance")
+  }
+
+  return await attendanceCollection().deleteMany(query)
+}
+
+const deleteAllAttendanceFromDb = async () => {
+  return await attendanceCollection().deleteMany({})
 }
 
 module.exports = {
-  getMembersFromDb, getEventsFromDb, getAttendanceFromDb, saveAttendanceToDb, saveEventToDb
+  getEventsFromDb, saveEventToDb, setEventRecorded, deleteEventFromDb, deleteAllEventsFromDb,
+  getMembersFromDb, saveMemberToDb, deleteMemberFromDb, deleteAllMembersFromDb,
+  getAttendanceFromDb, saveAttendanceToDb, deleteAttendanceFromDb, deleteAllAttendanceFromDb
 }

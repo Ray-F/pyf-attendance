@@ -3,6 +3,7 @@ import {CssBaseline} from '@material-ui/core';
 import MainRouter from './MainRouter';
 
 import '../styling/style.scss';
+import "react-vis/dist/style.css"
 
 class App extends Component {
 

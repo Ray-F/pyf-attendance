@@ -1,17 +1,11 @@
 import React, { useState } from 'react';
 import {
-  Checkbox,
-  FormControl,
-  FormControlLabel,
-  Grid,
-  InputLabel,
-  makeStyles,
-  MenuItem,
-  Select,
-  TextField
+  Checkbox, FormControl, FormControlLabel, Grid, InputLabel, makeStyles,
+  MenuItem, Select, TextField
 } from '@material-ui/core';
 
-import FormPaper from './FormPaper';
+import FormPaper from '../FormPaper';
+import { getDateFromDisplay, getDisplayDate } from "../../utils/DateTimeUtils";
 
 
 const useStyles =  makeStyles((theme) => ({
@@ -24,18 +18,6 @@ const useStyles =  makeStyles((theme) => ({
     }
   }
 }))
-
-const getDisplayDate = (date) => {
-  const month = (date.getMonth() + 1).toString().padStart(2, '0')
-  const day = date.getDate().toString().padStart(2, '0')
-  const year = date.getFullYear()
-
-  return `${year}-${month}-${day}`
-}
-
-const getDateFromDisplay = (date) => {
-  return new Date(date)
-}
 
 export default function EventForm(props) {
   const classes = useStyles()

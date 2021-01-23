@@ -1,12 +1,17 @@
 const { saveAttendanceToDb } = require("../models/mongodb/MongoRepository");
-const { getMembersFromDb, getEventsFromDb, getAttendanceFromDb } = require('../models/mongodb/MongoRepository')
-const ObjectId = require('mongodb').ObjectId
+const {
+  deleteAttendanceFromDb, setEventRecorded, deleteAllAttendanceFromDb,
+  getMembersFromDb, getEventsFromDb, getAttendanceFromDb
+} = require('../models/mongodb/MongoRepository')
+
+const { Attendance } = require('../models/Attendance')
 
 const getAttendanceSheet = async (req, res, next) => {
-  if (req.query.eventId) {
+  const eventId = req.query.eventId
+  if (eventId) {
     try {
       // The event we are getting attendance records for
-      const event = await getEventsFromDb(req.query.eventId)
+      const event = await getEventsFromDb(eventId)
 
       if (event.hasAttendanceRecords) {
         const records = await getAttendanceRecords(event)
@@ -27,45 +32,55 @@ const getAttendanceSheet = async (req, res, next) => {
 const getAllAttendanceRecords = async (req, res, next) => {
   const attendanceData = await getAttendanceFromDb()
 
-  const newRecords = attendanceData.map((record, index) => {
-    return {
-      id: index + 1,
-      fullName: record.member.fullName,
-      isShort: record.isLate,
-      isAbsent: record.isAbsent,
-      isExcused: record.isExcused,
-      excuseReason: record.excuseReason,
-      capacity: record.capacity
-    }
+  const records = attendanceData.map(record => {
+    return new Attendance(null, record).toDto()
   })
 
-  res.json(newRecords)
+  res.json(records)
 }
 
+const resetAttendance = async (req, res, next) => {
+  const deleteAttendanceResult = await deleteAllAttendanceFromDb()
+  await setEventRecorded(null, false)
+
+  res.send(`Delete successful: ${deleteAttendanceResult.result.n} attendance records deleted`)
+}
+
+/**
+ * Called when user submits an attendance sheet.
+ */
 const saveAttendanceSheet = async (req, res, next) => {
-  const parsedRecords = req.body.map((record, index) => {
-    return {
-      event: {
-        eventId: ObjectId(record.eventId),
-        type: record.eventType
-      },
-      member: {
-        memberId: ObjectId(record.memberId),
-        fullName: record.fullName
-      },
-      isLate: record.isShort,
-      isAbsent: record.isAbsent,
-      isExcused: record.isExcused,
-      excuseReason: record.excuseReason,
-      capacity: record.capacity
+  const records = req.body.map(record => new Attendance(record, null).toDbo())
+  const eventId = req.body[0].eventId
+  const eventObject = await getEventsFromDb(eventId)
+
+  if (eventObject === null) {
+    res.sendStatus(500)
+  } else {
+    if (eventObject.hasAttendanceRecords) {
+      await deleteAttendanceFromDb(eventId)
     }
-  })
 
-  saveAttendanceToDb(parsedRecords)
-
-  res.sendStatus(200)
+    await setEventRecorded(eventId, true)
+    await saveAttendanceToDb(records)
+    res.sendStatus(200)
+  }
 }
 
+const deleteAttendanceRecords = async (req, res, next) => {
+  if (req.query.eventId) {
+    const deleteAttendanceResult = await deleteAttendanceFromDb(req.query.eventId)
+    await setEventRecorded(req.query.eventId, false)
+
+    res.send(`Delete successful: ${deleteAttendanceResult.result.n} attendance records deleted for event ${req.query.eventId}`)
+  } else if (req.query.memberId) {
+    const deleteAttendanceResult = await deleteAttendanceFromDb(null, req.query.memberId)
+
+    res.send(`Delete successful: ${deleteAttendanceResult.result.n} attendance records deleted for member ${req.query.memberId}`)
+  } else {
+    res.status(404).send("No event/member Id specified! No records deleted")
+  }
+}
 
 /**
  * Call this for an event where we already have records (i.e event.hasAttendanceRecords = `true`).
@@ -73,20 +88,8 @@ const saveAttendanceSheet = async (req, res, next) => {
 const getAttendanceRecords = async (eventObject) => {
   const attendanceData = await getAttendanceFromDb(eventObject._id)
 
-  return attendanceData.map((record, index) => {
-    return {
-      objectId: record._id,
-      memberId: record.member.memberId,
-      fullName: record.member.fullName,
-      eventId: record.event.eventId,
-      eventType: record.event.type,
-      id: index + 1,
-      isShort: record.isLate,
-      isAbsent: record.isAbsent,
-      isExcused: record.isExcused,
-      excuseReason: record.excuseReason,
-      capacity: record.capacity
-    }
+  return attendanceData.map(record => {
+    return new Attendance(null, record).toDto()
   })
 }
 
@@ -96,25 +99,26 @@ const getAttendanceRecords = async (eventObject) => {
 const generateNewAttendanceRecords = async (eventObject) => {
   const members = await getMembersFromDb()
 
-  return members.filter((member, index) => {
+  return members.filter(member => {
     return (new Date(member.startDate) < new Date(eventObject.date))
   }).map((member, index) => {
-    return {
-      memberId: member.memberId,
+    const attendancePojo = {
+      memberId: member._id,
       fullName: member.fullName,
       eventId: eventObject._id,
       eventType: eventObject.type,
-      id: index + 1,
       isShort: false,
       isAbsent: false,
       isExcused: false,
       excuseReason: '',
       capacity: 1
     }
+
+    return new Attendance(attendancePojo).toDto()
   })
 }
 
 
 module.exports = {
-  getAttendanceSheet, saveAttendanceSheet, getAllAttendanceRecords
+  getAttendanceSheet, saveAttendanceSheet, getAllAttendanceRecords, resetAttendance, deleteAttendanceRecords
 }

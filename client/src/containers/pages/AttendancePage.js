@@ -1,6 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core';
-import AttendanceForm from "../../components/AttendanceForm";
+import AttendanceForm from "../../components/attendance/AttendanceForm";
 
 
 const useStyles = makeStyles((theme) => ({

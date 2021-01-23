@@ -4,7 +4,7 @@ import {
   makeStyles, MenuItem, Select, Slider, TextField, Typography
 } from "@material-ui/core";
 
-import FormPaper from "./FormPaper";
+import FormPaper from "../FormPaper";
 import { DataGrid } from "@material-ui/data-grid";
 import { amber, green, grey, orange, red } from "@material-ui/core/colors";
 
@@ -120,7 +120,7 @@ const findOldAndNew = (attendanceData, params) => {
 }
 
 export default function AttendanceForm(props) {
-  const numberRecentEvents = 5
+  const numberRecentEvents = 10
 
   const [attendanceData, setAttendanceData] = useState([])
   const [currentEvent, setCurrentEvent] = useState('')
@@ -135,15 +135,15 @@ export default function AttendanceForm(props) {
     fetch(`/api/events/recent?number=${numberRecentEvents}`, { method: 'GET'} ).then(async (res) => {
       const data = await res.json()
       setRecentEvents(data)
+      setAttendanceData([])
     })
-  }, [])
+  }, [submitSuccessful])
 
   const handleCurrentEventChange = (newEvent) => {
     setAttendanceData([])
     setCurrentEvent(newEvent)
     fetch(`/api/attendance?eventId=${newEvent._id}`, { method: 'GET' }).then(async (res) => {
       const data = await res.json()
-
       setAttendanceData(data)
     })
   }
@@ -184,22 +184,22 @@ export default function AttendanceForm(props) {
   }
 
   const handleSubmit = () => {
-
     const reqOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(attendanceData)
     }
 
-    fetch('api/attendance', reqOptions).then(async (promise) => {
+    fetch('/api/attendance', reqOptions).then(async (promise) => {
       const res = await promise
 
       if (res.statusCode === 500) {
         throw new Error("An error occurred when trying to save attendance data")
       } else {
-        setSubmitSuccessful(1)
-        console.log(res)
+        setSubmitSuccessful(submitSuccessful + 1)
         setPromptMessage("Successfully submitted attendance form!")
+
+        setTimeout(() => setPromptMessage(''), 3000)
       }
     })
   }
@@ -240,7 +240,7 @@ export default function AttendanceForm(props) {
         <TextField className={classes.reasonField}
                    disabled={!params.getValue('isExcused')}
                    defaultValue={params.getValue('excuseReason')}
-                   onChange={(e) => handleExcuseReasonChange(e.target.value, params)} />
+                   onBlur={(e) => handleExcuseReasonChange(e.target.value, params)} />
       )
     }
   ]

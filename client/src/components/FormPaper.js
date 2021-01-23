@@ -1,18 +1,9 @@
 import React from 'react'
 import { Paper, makeStyles, Grid, Typography, Box, Button } from '@material-ui/core'
+import DisplayPaper from "./DisplayPaper";
 
 
 const useStyles =  makeStyles((theme) => ({
-  container: {
-    margin: "0 auto",
-    width: 500,
-    maxWidth: '100%',
-    padding: 30,
-    "& > *": {
-      margin: "10px 0 0 0"
-    }
-  },
-
   successCaption: {
     marginTop: 10,
     display: 'block',
@@ -37,31 +28,25 @@ export default function FormPaper(props) {
   const classes = useStyles()
 
   return (
-    <Paper className={`${classes.container} ${props.className}`}>
-      <Box>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <Typography variant='h6'>{props.formTitle}</Typography>
-          </Grid>
-          {props.children}
-          <Grid item xs={12}>
-            <Typography variant="body2" className={classes.requiredFields}>
-              * required fields
-            </Typography>
-          </Grid>
+    <DisplayPaper className={props.className} formTitle={props.formTitle}>
 
-          <Grid item xs={12}>
-            <Button variant="contained" color="primary" onClick={props.handleSubmit}>
-              Submit
-            </Button>
+      {props.children}
 
-            <Typography variant="body2" className={(props.submitSuccess) ? classes.successCaption : classes.errorCaption}>
-              {props.promptMessage}
-            </Typography>
+      <Grid item xs={12}>
+        <Typography variant="body2" className={classes.requiredFields}>
+          * required fields
+        </Typography>
+      </Grid>
 
-          </Grid>
-        </Grid>
-      </Box>
-    </Paper>
+      <Grid item xs={12}>
+        <Button variant="contained" color="primary" onClick={props.handleSubmit}>
+          Submit
+        </Button>
+
+        <Typography variant="body2" className={(props.submitSuccess) ? classes.successCaption : classes.errorCaption}>
+          {props.promptMessage}
+        </Typography>
+      </Grid>
+    </DisplayPaper>
   )
 }

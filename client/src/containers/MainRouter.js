@@ -5,19 +5,25 @@ import {BrowserRouter, Switch, Route} from 'react-router-dom';
 import AttendancePage from './pages/AttendancePage';
 import MemberPage from "./pages/MemberPage";
 import EventPage from "./pages/EventPage";
+import HomePage from "./pages/HomePage";
+import BackButton from "../components/navigation/BackButton";
 
 
 class MainRouter extends Component {
 
   render() {
     return (
-      <BrowserRouter>
-        <Switch>
-          <Route exact path={"/event"} component={EventPage} />
-          <Route path={"/member"} component={MemberPage} />
-          <Route path={"/attendance"} component={AttendancePage} />
-        </Switch>
-      </BrowserRouter>
+      <React.Fragment>
+        <BrowserRouter>
+          <BackButton />
+          <Switch>
+            <Route exact path={"/events/:operation?"} component={EventPage} />
+            <Route path={"/members/add"} component={MemberPage} />
+            <Route path={"/attendance"} component={AttendancePage} />
+            <Route path={""} component={HomePage} />
+          </Switch>
+        </BrowserRouter>
+      </React.Fragment>
     );
   }
 }

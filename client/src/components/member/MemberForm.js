@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { makeStyles, Paper, Typography, TextField, Select, Grid, Button, Hidden,
-  MenuItem, InputLabel, FormControl, FormControlLabel, Checkbox } from '@material-ui/core';
+import React, { useState } from 'react';
+import { Checkbox, FormControlLabel, Grid, makeStyles, TextField } from '@material-ui/core';
 
-import FormPaper from './FormPaper';
+import FormPaper from '../FormPaper';
+import { getDateFromDisplay, getDisplayDate } from "../../utils/DateTimeUtils";
 
 
 const useStyles =  makeStyles((theme) => ({
@@ -29,14 +29,13 @@ const getDate = () => {
   return `${year}-${month}-${day}`
 }
 
-export default function EventForm(props) {
+export default function MemberForm(props) {
   const classes = useStyles()
 
-
   const [memberName, setMemberName] = useState('')
-  const [isLeadership, setIsLeadership] = useState(0)
-  const [leadershipStartDate, setLeadershipStartDate] = useState(getDate())
-  const [startDate, setStartDate] = useState(getDate())
+  const [isLeadership, setIsLeadership] = useState(false)
+  const [leadershipStartDate, setLeadershipStartDate] = useState(new Date())
+  const [startDate, setStartDate] = useState(new Date())
 
   const [submitSuccessful, setSubmitSuccessful] = useState(null)
   const [promptMessage, setPromptMessage] = useState('')
@@ -49,8 +48,31 @@ export default function EventForm(props) {
       return
     }
 
-    setSubmitSuccessful(1)
-    setPromptMessage("Successfully submitted!")
+    const memberObject = {
+      fullName: memberName,
+      startDate: startDate,
+      isLeadership: isLeadership,
+      leadershipStartDate: leadershipStartDate
+    }
+
+    const reqOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(memberObject)
+    }
+
+    fetch('/api/members/add', reqOptions).then(async (promise) => {
+      const res = await promise
+
+      if (res.statusCode == 500) {
+        setSubmitSuccessful(0)
+        setPromptMessage("Some unknown error occurred on the server")
+        throw new Error("An error occurred when trying to save new event")
+      } else {
+        setSubmitSuccessful(1)
+        setPromptMessage("Successfully added new member")
+      }
+    })
 
     // do some fetching to server stuff
   }
@@ -63,8 +85,8 @@ export default function EventForm(props) {
       required={true}
       label="Leadership Start Date"
       type="date"
-      value={leadershipStartDate}
-      onChange={(e) => setLeadershipStartDate(e.target.value)}
+      value={getDisplayDate(leadershipStartDate)}
+      onChange={(e) => setLeadershipStartDate(getDateFromDisplay(e.target.value))}
     />
   )
 
@@ -99,8 +121,8 @@ export default function EventForm(props) {
           required={true}
           label="Member Start Date"
           type="date"
-          value={startDate}
-          onChange={(e) => setLeadershipStartDate(e.target.value)}
+          value={getDisplayDate(startDate)}
+          onChange={(e) => setStartDate(getDateFromDisplay(e.target.value))}
         />
       </Grid>
 
