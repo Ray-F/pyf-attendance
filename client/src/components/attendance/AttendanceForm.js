@@ -7,6 +7,7 @@ import {
 import FormPaper from "../FormPaper";
 import { DataGrid } from "@material-ui/data-grid";
 import { amber, green, grey, orange, red } from "@material-ui/core/colors";
+import { getNiceDate } from "../../utils/DateTimeUtils";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -107,10 +108,6 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const getNiceDate = (dateStr) => {
-  const date = new Date(dateStr)
-  return date.toDateString().split("").slice(4).join('')
-}
 
 const findOldAndNew = (attendanceData, params) => {
   const currentEntry = attendanceData.find((entry) => (entry.id === params.getValue('id')))

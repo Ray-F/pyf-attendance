@@ -18,7 +18,7 @@ class MainRouter extends Component {
           <BackButton />
           <Switch>
             <Route exact path={"/events/:operation?"} component={EventPage} />
-            <Route path={"/members/add"} component={MemberPage} />
+            <Route path={"/members/:operation?"} component={MemberPage} />
             <Route path={"/attendance"} component={AttendancePage} />
             <Route path={""} component={HomePage} />
           </Switch>

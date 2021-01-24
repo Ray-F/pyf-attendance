@@ -67,10 +67,12 @@ export default function MemberForm(props) {
       if (res.statusCode == 500) {
         setSubmitSuccessful(0)
         setPromptMessage("Some unknown error occurred on the server")
+        setTimeout(() => setPromptMessage(''), 3000)
         throw new Error("An error occurred when trying to save new event")
       } else {
         setSubmitSuccessful(1)
         setPromptMessage("Successfully added new member")
+        setTimeout(() => setPromptMessage(''), 3000)
       }
     })
 
@@ -85,7 +87,7 @@ export default function MemberForm(props) {
       required={true}
       label="Leadership Start Date"
       type="date"
-      value={getDisplayDate(leadershipStartDate)}
+      defaultValue={getDisplayDate(leadershipStartDate)}
       onChange={(e) => setLeadershipStartDate(getDateFromDisplay(e.target.value))}
     />
   )
@@ -121,7 +123,7 @@ export default function MemberForm(props) {
           required={true}
           label="Member Start Date"
           type="date"
-          value={getDisplayDate(startDate)}
+          defaultValue={getDisplayDate(startDate)}
           onChange={(e) => setStartDate(getDateFromDisplay(e.target.value))}
         />
       </Grid>

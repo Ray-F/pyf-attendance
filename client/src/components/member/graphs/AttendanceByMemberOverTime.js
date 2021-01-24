@@ -17,15 +17,13 @@ const useStyles = makeStyles((theme) => ({
 const propTypes = {
   className: PropTypes.object,
   meetingData: PropTypes.array.isRequired,
-  eventData: PropTypes.array.isRequired,
   height: PropTypes.number.isRequired,
 }
 
-function AttendanceByEventTypeOverTime(props) {
+function AttendanceByMemberOverTime(props) {
   const classes = useStyles()
 
   const meetingData = props.meetingData.sort((a, b) => (a.x < b.x ? 1 : -1))
-  const eventData = props.eventData.sort((a, b) => (a.x < b.x ? 1 : -1))
 
   const yPercent = 70
   let line = []
@@ -35,20 +33,17 @@ function AttendanceByEventTypeOverTime(props) {
   }
 
   return (
-    <Plot height={props.height} plotTitle={"Attendance over time"}>
+    <Plot height={props.height} plotTitle={`${props.memberName}'s attendance over time`}>
 
       <LineSeries data={meetingData} style={{ strokeWidth: 2 }} />
-      <LineSeries data={eventData} style={{ strokeWidth: 2 }} />
       <LineSeries data={line} style={{ strokeWidth: 1 }} strokeStyle={'dashed'} />
 
       <XAxis title={"Time"} position={"middle"} />
       <YAxis title="Attendance %"  position={"middle"} />
-
-      <DiscreteColorLegend className={classes.legend} items={[{title: "Meeting"}, {title: "Project"}]} orientation={'vertical'} />
     </Plot>
   )
 }
 
-AttendanceByEventTypeOverTime.propTypes = propTypes
+AttendanceByMemberOverTime.propTypes = propTypes
 
-export default AttendanceByEventTypeOverTime
+export default AttendanceByMemberOverTime

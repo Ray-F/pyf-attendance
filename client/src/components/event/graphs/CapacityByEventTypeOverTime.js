@@ -1,9 +1,19 @@
 import React from 'react'
 import { makeStyles } from "@material-ui/core";
-import { ChartLabel, DiscreteColorLegend, FlexibleWidthXYPlot, LineSeries, XAxis, YAxis } from "react-vis";
+import {
+  ChartLabel,
+  DiscreteColorLegend,
+  FlexibleWidthXYPlot,
+  LineSeries,
+  RectSeries,
+  VerticalRectSeries,
+  XAxis,
+  YAxis
+} from "react-vis";
 import DisplayPaper from "../../DisplayPaper";
 import PropTypes from 'prop-types';
 import Plot from "../../Plot";
+import BarSeries from "react-vis/es/plot/series/bar-series";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -17,7 +27,6 @@ const useStyles = makeStyles((theme) => ({
 const propTypes = {
   className: PropTypes.object,
   meetingData: PropTypes.array.isRequired,
-  eventData: PropTypes.array.isRequired,
   height: PropTypes.number.isRequired,
 }
 
@@ -25,9 +34,8 @@ function AttendanceByEventTypeOverTime(props) {
   const classes = useStyles()
 
   const meetingData = props.meetingData.sort((a, b) => (a.x < b.x ? 1 : -1))
-  const eventData = props.eventData.sort((a, b) => (a.x < b.x ? 1 : -1))
 
-  const yPercent = 70
+  const yPercent = 30
   let line = []
   if (meetingData.length) {
     line.push({ x: meetingData[0].x, y: yPercent })
@@ -35,16 +43,16 @@ function AttendanceByEventTypeOverTime(props) {
   }
 
   return (
-    <Plot height={props.height} plotTitle={"Attendance over time"}>
+    <Plot height={props.height} plotTitle={"Meeting capacity over time"} yDomain={[0, 100]}>
+      <VerticalRectSeries data={meetingData} stroke={'white'} />
 
-      <LineSeries data={meetingData} style={{ strokeWidth: 2 }} />
-      <LineSeries data={eventData} style={{ strokeWidth: 2 }} />
-      <LineSeries data={line} style={{ strokeWidth: 1 }} strokeStyle={'dashed'} />
+      <XAxis />
+      <YAxis />
 
-      <XAxis title={"Time"} position={"middle"} />
-      <YAxis title="Attendance %"  position={"middle"} />
 
-      <DiscreteColorLegend className={classes.legend} items={[{title: "Meeting"}, {title: "Project"}]} orientation={'vertical'} />
+      <ChartLabel text={"Capacity %"} xPercent={-0.065} yPercent={1} includeMargin={false}
+                  style={{ transform: 'rotate(-90)', textAnchor: 'middle', fontWeight: '700' }} />
+      <ChartLabel text={"Time"} xPercent={1} yPercent={1.2} includeMargin={false} style={{fontWeight: '700'}} />
     </Plot>
   )
 }

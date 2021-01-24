@@ -30,23 +30,27 @@ export default function FormPaper(props) {
   return (
     <DisplayPaper className={props.className} formTitle={props.formTitle}>
 
-      {props.children}
+      <Grid container xs={12} spacing={2}>
+        {props.children}
 
-      <Grid item xs={12}>
-        <Typography variant="body2" className={classes.requiredFields}>
-          * required fields
-        </Typography>
+        <Grid item xs={12}>
+          <Typography variant="body2" className={classes.requiredFields}>
+            * required fields
+          </Typography>
+        </Grid>
+
+        <Grid item xs={12}>
+          <Button variant="contained" color="primary" onClick={props.handleSubmit}>
+            Submit
+          </Button>
+
+          <Typography variant="body2" className={(props.submitSuccess) ? classes.successCaption : classes.errorCaption}>
+            {props.promptMessage}
+          </Typography>
+        </Grid>
       </Grid>
 
-      <Grid item xs={12}>
-        <Button variant="contained" color="primary" onClick={props.handleSubmit}>
-          Submit
-        </Button>
 
-        <Typography variant="body2" className={(props.submitSuccess) ? classes.successCaption : classes.errorCaption}>
-          {props.promptMessage}
-        </Typography>
-      </Grid>
     </DisplayPaper>
   )
 }

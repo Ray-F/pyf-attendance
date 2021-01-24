@@ -20,7 +20,6 @@ export default function EventPage(props) {
   switch (operation) {
     case 'add': return <EventForm className={classes.paper} />
     case 'delete':return <DisplayPaper className={classes.paper} formTitle={"Delete event"} />
-    case 'get': return <AttendanceByEventTypeOverTime />
     case 'list':
     default:
       return <EventList className={classes.paper} />

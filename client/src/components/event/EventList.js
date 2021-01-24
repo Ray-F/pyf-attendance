@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import DisplayPaper from "../DisplayPaper";
-import { Box, Card, CardActions, CardContent, Container, Grid, makeStyles, Typography } from "@material-ui/core";
+import { Box, Container, Divider, Grid, Hidden, IconButton, makeStyles, Typography } from "@material-ui/core";
 import AttendanceByEventTypeOverTime from "./graphs/AttendanceByEventTypeOverTime";
+import { DataGrid } from "@material-ui/data-grid";
+import { amber, green, grey, orange, red } from "@material-ui/core/colors";
+
+import DeleteIcon from '@material-ui/icons/Delete'
+import EditIcon from '@material-ui/icons/Edit';
+import CapacityByEventTypeOverTime from "./graphs/CapacityByEventTypeOverTime";
+import { getAttendanceColours, getCapacityColour } from "../../utils/CapacityUtils";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -9,41 +16,26 @@ const useStyles = makeStyles((theme) => ({
     margin: "50px auto"
   },
 
-  card: {
-    display: 'block',
-    width: '100%',
-    marginBottom: theme.spacing(2),
-    position: 'relative',
-
-    "&:hover": {
-      boxShadow: '0 0 2px grey'
-    }
+  dataGridContainer: {
+    height: 650,
+    width: '100%'
   },
 
-  inlineContainer: {
-    display: 'inline'
+  dataGrid: {
+    minHeight: 520,
+    margin: `${theme.spacing(2)}px 0`
   },
 
-  status: {
-    textAlign: 'right'
+  capacityIndicator: {
+    width: 35,
+    borderRadius: 100,
+    height: 35,
+    marginLeft: 15
   },
 
-  newIndicator: {
-    marginLeft: '10px',
-    fontSize: '0.8em',
-    color: theme.palette.primary.main
-  },
-
-  cardContentArea: {
-  },
-
-  cardActionArea: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    height: '100%',
-    width: 100,
-    background: '#f0f0f6'
+  optionIconContainer: {
+    margin: '0 0 0 -5px',
+    display: 'flex'
   },
 
   graph: {
@@ -73,18 +65,23 @@ export default function EventList(props) {
 
           const attendanceForEvent = data.filter((attendance) => attendance.eventId === event._id)
 
+          const nShouldAttend = attendanceForEvent.length
+
           // If no one was supposed to turn up, we cannot generate any information
-          const nAttendance = attendanceForEvent.length
-          if (nAttendance === 0) return event
+          if (nShouldAttend === 0) return event
+
+          let totalCapacity = 0
+          const inAttendance = attendanceForEvent.filter((attendance) => attendance.isAbsent !== true)
+          inAttendance.forEach((attendance) => {
+              if (event.type === "Meeting") {
+                totalCapacity += attendance.capacity
+              }
+            }
+          )
 
           let totalAttendance = 0
-          let totalCapacity = 0
 
           attendanceForEvent.forEach((attendance) => {
-            if (event.type === "Meeting") {
-              totalCapacity += attendance.capacity
-            }
-
             if (attendance.isShort) {
               totalAttendance += 0.8
             } else if (!attendance.isAbsent) {
@@ -92,8 +89,8 @@ export default function EventList(props) {
             }
           })
 
-          event.averageCapacity = Math.round(totalCapacity / nAttendance * 100) / 100
-          event.averageAttendance = Math.round(totalAttendance / nAttendance * 100)
+          event.averageCapacity = Math.round(totalCapacity / inAttendance.length * 100) / 100
+          event.averageAttendance = Math.round(totalAttendance / nShouldAttend * 100)
 
           return event
         })
@@ -119,51 +116,114 @@ export default function EventList(props) {
       }
     })
 
+  const meetingCapacityXY = events.filter((event) => event.type === "Meeting" && event.averageCapacity !== undefined)
+    .map((event) => {
+      return {
+        x0: new Date(event.date) - 1000 * 60 * 60 * 24 * 6,
+        x: new Date(event.date),
+        y: (5 - event.averageCapacity) * 25,
+        color: Math.round(event.averageCapacity)
+      }
+    })
+
+  const columns = [
+    {
+      field: 'name', headerName: 'Event Name', description: 'Name of the event',
+      sortable: false, disableColumnMenu: true, width: 160
+    },
+    {
+      field: 'date', headerName: 'Date',
+      sortable: true, sortDirection: 'desc', disableColumnMenu: true, width: 100,
+      renderCell: (params) => (
+        new Date(params.getValue('date')).toLocaleDateString('en-NZ').padStart(10, '0')
+      )
+    },
+    // {
+    //   field: 'type', headerName: 'Type',
+    //   sortable: false, disableColumnMenu: true, width: 100
+    // },
+    {
+      field: 'attendanceAvg', headerName: 'A %',
+      sortable: true, disableColumnMenu: true, width: 60,
+      renderCell: (params) => {
+        const colour = getAttendanceColours(params.getValue('attendanceAvg'))
+
+        return (<span style={{color: colour}}>{params.getValue('attendanceAvg')}%</span>)
+      }
+    },
+    {
+      field: 'capacityAvg', headerName: 'Capacity',
+      sortable: true, disableColumnMenu: true, width: 100, headerAlign: 'center',
+      renderCell: (params) => {
+        const colour = getCapacityColour(params.getValue('capacityAvg'))
+
+        return (<Box style={{ backgroundColor: colour }} className={classes.capacityIndicator} />)
+      }
+    },
+    {
+      field: 'options', headerName: 'Options',
+      disableColumnMenu: true, width: 120, headerAlign: 'center',
+      renderCell: (params) => {
+        return (
+          <Box className={classes.optionIconContainer}>
+            <IconButton><EditIcon /></IconButton>
+            <Divider orientation="vertical" flexItem />
+            <IconButton><DeleteIcon /></IconButton>
+          </Box>
+
+
+        )
+      }
+    }
+  ]
+
+  const rows = events.map((event, index) => {
+    return {
+      id: index,
+      name: event.title,
+      type: event.type,
+      date: event.date,
+      attendanceAvg: event.averageAttendance,
+      capacityAvg: event.averageCapacity
+    }
+  })
+
   return (
     <Container maxWidth={'lg'} className={classes.container}>
       <Grid container spacing={2}>
-        <Grid item xs={12} lg={5}>
-          <DisplayPaper formTitle={"List of events"}>
-            {events.map((event, index) => {
-              return (
-                <Card key={index} className={classes.card} variant={'outlined'} raised={false}>
-                  <CardContent className={classes.cardContentArea} data-to-submit={!event.hasAttendanceRecords}>
-                    <Grid container>
-                      <Grid item xs={12}>
-                        <Typography className={classes.inlineContainer} variant={'h6'}>{event.title}</Typography>
-                        <i className={classes.newIndicator}>{!(event.hasAttendanceRecords) ? "Yet to submit" : ""}</i>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Typography variant={'body2'}>{new Date(event.date).toDateString()}</Typography>
-                      </Grid>
-
-                      <Grid item xs={12}>
-                        <Typography variant={'body2'}>{event.type}</Typography>
-                        <Typography variant={'body2'}><b>{event.averageAttendance}% attendance – capacity level {event.averageCapacity}</b></Typography>
-                      </Grid>
-                    </Grid>
-                  </CardContent>
-                  <CardActions className={classes.cardActionArea}>
-
-                  </CardActions>
-                </Card>
-              )
-            })}
+        <Hidden lgUp>
+          <Grid item xs={1} />
+        </Hidden>
+        <Grid item xs={10} lg={6}>
+          <DisplayPaper formTitle={"List of members"} className={classes.dataGridContainer}>
+            <DataGrid className={classes.dataGrid}
+                      columns={columns} rows={rows}
+                      rowHeight={40} headerHeight={50}
+                      pageSize={10}
+            />
           </DisplayPaper>
         </Grid>
 
-        <Grid item xs={12} lg={7}>
+        <Hidden lgUp>
+          <Grid item xs={1} />
+        </Hidden>
+
+        <Hidden lgUp>
+          <Grid item xs={1} />
+        </Hidden>
+
+        <Grid item xs={10} lg={6}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <AttendanceByEventTypeOverTime
                 className={classes.graph}
-                meetingData={meetingAttendanceXY} eventData={eventAttendanceXY} height={300}
+                meetingData={meetingAttendanceXY} eventData={eventAttendanceXY} height={250}
               />
             </Grid>
             <Grid item xs={12}>
-              <AttendanceByEventTypeOverTime
+              <CapacityByEventTypeOverTime
                 className={classes.graph}
-                meetingData={meetingAttendanceXY} eventData={eventAttendanceXY} height={300}
+                meetingData={meetingCapacityXY} height={250}
               />
             </Grid>
           </Grid>

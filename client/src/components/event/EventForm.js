@@ -62,11 +62,13 @@ export default function EventForm(props) {
         } else {
           setSubmitSuccessful(1)
           setPromptMessage("Successfully submitted new event!")
+          setTimeout(() => setPromptMessage(''), 3000)
         }
       })
     } else {
       setSubmitSuccessful(0)
       setPromptMessage("Invalid event type!")
+      setTimeout(() => setPromptMessage(''), 3000)
     }
   }
 
@@ -104,7 +106,7 @@ export default function EventForm(props) {
       <Grid item xs={6}>
         <TextField
           className={classes.textFieldInput} required={true} label="Event Date" type="date"
-          value={getDisplayDate(eventDate)} onChange={(e) => setEventDate(getDateFromDisplay(e.target.value))}
+          defaultValue={getDisplayDate(eventDate)} onChangeCapture={(e) => setEventDate(getDateFromDisplay(e.target.value))}
         />
       </Grid>
 

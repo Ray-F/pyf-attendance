@@ -31,7 +31,11 @@ function DisplayPaper(props) {
             <Typography variant='h6'>{props.formTitle}</Typography>
           </Grid>
 
-          {props.children}
+          <Grid item xs={12}>
+            {props.children}
+          </Grid>
+
+
         </Grid>
       </Box>
     </Paper>

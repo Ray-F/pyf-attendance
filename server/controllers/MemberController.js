@@ -42,7 +42,7 @@ const resetMembers = async (req, res, next) => {
   const deleteResult = await deleteAllMembersFromDb()
   const deleteAttendanceResult = await deleteAllAttendanceFromDb()
 
-  res.status(200).send(`Delete successful: ${deleteResult.result.n} events and ${deleteAttendanceResult.result.n} attendance records were wiped.`)
+  res.status(200).send(`Delete successful: ${deleteResult.result.n} members and ${deleteAttendanceResult.result.n} attendance records were wiped.`)
 }
 
 module.exports = {

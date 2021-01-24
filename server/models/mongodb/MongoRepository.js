@@ -89,11 +89,11 @@ const setEventRecorded = async (eventId = null, recorded = true) => {
  */
 const getAttendanceFromDb = async (eventId = null, memberId = null) => {
   if (eventId) {
-    return await attendanceCollection().find({ "event.eventId": ObjectId(eventId) }).toArray()
+    return await attendanceCollection().find({ "event.eventId": ObjectId(eventId) }).sort({'_id' : -1}).toArray()
   } else if (memberId) {
-    return await attendanceCollection().find({ "member.memberId": ObjectId(memberId) }).toArray()
+    return await attendanceCollection().find({ "member.memberId": ObjectId(memberId) }).sort({'_id' : -1}).toArray()
   } else {
-    return await attendanceCollection().find({}).toArray()
+    return await attendanceCollection().find({}).sort({'_id' : -1}).toArray()
   }
 }
 
