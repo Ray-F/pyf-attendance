@@ -8,7 +8,7 @@ import { amber, green, grey, orange, red } from "@material-ui/core/colors";
 import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit';
 import CapacityByEventTypeOverTime from "./graphs/CapacityByEventTypeOverTime";
-import { getAttendanceColours, getCapacityColour } from "../../utils/CapacityUtils";
+import { getAttendanceColour, getCapacityColour } from "../../utils/CapacityUtils";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -40,6 +40,11 @@ const useStyles = makeStyles((theme) => ({
 
   graph: {
     width: '100%'
+  },
+
+  recordIndicator: {
+    fontStyle: 'italic',
+    color: theme.palette.primary.main
   }
 }));
 
@@ -129,7 +134,10 @@ export default function EventList(props) {
   const columns = [
     {
       field: 'name', headerName: 'Event Name', description: 'Name of the event',
-      sortable: false, disableColumnMenu: true, width: 160
+      sortable: false, disableColumnMenu: true, width: 160,
+      renderCell: (params) => (
+        <span className={(params.getValue('hasRecords')) ? null : classes.recordIndicator}>{params.getValue('name')}</span>
+      )
     },
     {
       field: 'date', headerName: 'Date',
@@ -146,7 +154,7 @@ export default function EventList(props) {
       field: 'attendanceAvg', headerName: 'A %',
       sortable: true, disableColumnMenu: true, width: 60,
       renderCell: (params) => {
-        const colour = getAttendanceColours(params.getValue('attendanceAvg'))
+        const colour = getAttendanceColour(params.getValue('attendanceAvg'))
 
         return (<span style={{color: colour}}>{params.getValue('attendanceAvg')}%</span>)
       }
@@ -184,7 +192,8 @@ export default function EventList(props) {
       type: event.type,
       date: event.date,
       attendanceAvg: event.averageAttendance,
-      capacityAvg: event.averageCapacity
+      capacityAvg: event.averageCapacity,
+      hasRecords: event.hasAttendanceRecords
     }
   })
 
@@ -195,7 +204,7 @@ export default function EventList(props) {
           <Grid item xs={1} />
         </Hidden>
         <Grid item xs={10} lg={6}>
-          <DisplayPaper formTitle={"List of members"} className={classes.dataGridContainer}>
+          <DisplayPaper formTitle={"List of events"} className={classes.dataGridContainer}>
             <DataGrid className={classes.dataGrid}
                       columns={columns} rows={rows}
                       rowHeight={40} headerHeight={50}

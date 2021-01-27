@@ -100,7 +100,14 @@ const generateNewAttendanceRecords = async (eventObject) => {
   const members = await getMembersFromDb()
 
   return members.filter(member => {
-    return (new Date(member.startDate) < new Date(eventObject.date))
+    const startDate = new Date(member.startDate)
+    const eventDate = new Date(eventObject.date)
+    const endDate = (member.endDate) ? (new Date(member.endDate)) : null
+
+    if (endDate) {
+      return (eventDate > startDate && eventDate < endDate)
+    }
+    return (eventDate > startDate)
   }).map((member, index) => {
     const attendancePojo = {
       memberId: member._id,

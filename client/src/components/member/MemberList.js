@@ -4,7 +4,7 @@ import { Box, Container, Divider, Grid, Hidden, IconButton, makeStyles } from "@
 import { DataGrid } from "@material-ui/data-grid";
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import EditIcon from '@material-ui/icons/Edit';
-import { getAttendanceColours, getCapacityColour } from "../../utils/CapacityUtils";
+import { getAttendanceColour, getCapacityColour } from "../../utils/CapacityUtils";
 import AttendanceByMemberOverTime from "./graphs/AttendanceByMemberOverTime";
 import CapacityByMemberOverTime from "./graphs/CapacityByMemberOverTime";
 
@@ -174,7 +174,7 @@ export default function MemberList(props) {
       sortable: true, disableColumnMenu: true, width: 60,
       renderCell: (params) => {
 
-        let colour = getAttendanceColours(params.getValue('attendanceAvg'))
+        let colour = getAttendanceColour(params.getValue('attendanceAvg'))
 
         if (params.getValue('attendanceAvg') === null) {
           return (<span style={{color: 'grey'}}>- %</span>)

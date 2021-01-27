@@ -16,7 +16,6 @@ const attendanceCollection = () => {
 
 /**
  * Database access functions – depending on the parameters passed, this will determine the search return.
- *
  */
 const getMembersFromDb = async (memberId = null) => {
   if (memberId) return await memberCollection().findOne({ "_id": ObjectId(memberId) }).toObject();

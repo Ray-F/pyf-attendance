@@ -22,7 +22,7 @@ export function getCapacityColour(capacityLevel) {
   return colour
 }
 
-export function getAttendanceColours(attendancePct) {
+export function getAttendanceColour(attendancePct) {
   if (attendancePct === null || attendancePct === undefined) {
     return colourGrey
   } else if (attendancePct > 80) {

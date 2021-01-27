@@ -11,6 +11,10 @@ const useStyles = makeStyles((theme) => ({
     margin: '20px 0'
   },
 
+  link: {
+    textDecoration: 'none'
+  },
+
   actionButton: {
     width: '200px',
     height: '100px',
@@ -24,7 +28,7 @@ export default function HomePage() {
   function buttonFactory(link, text) {
     return (
       <Grid item xs={6} sm={3}>
-        <Link to={link}>
+        <Link to={link} className={classes.link}>
           <Button className={classes.actionButton} variant={'outlined'} color={'primary'}>{text}</Button>
         </Link>
       </Grid>
