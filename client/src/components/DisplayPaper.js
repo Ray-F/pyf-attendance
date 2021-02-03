@@ -17,7 +17,7 @@ const useStyles =  makeStyles((theme) => ({
 }))
 
 let propTypes = {
-  className: PropTypes.object,
+  className: PropTypes.string,
   formTitle: PropTypes.string.isRequired
 }
 function DisplayPaper(props) {

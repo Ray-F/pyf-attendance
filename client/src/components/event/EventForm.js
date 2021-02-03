@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  Box,
   Checkbox, FormControl, FormControlLabel, Grid, InputLabel, makeStyles,
   MenuItem, Select, TextField
 } from '@material-ui/core';
@@ -28,24 +29,43 @@ export default function EventForm(props) {
     'Project'
   ]
 
+  const [isNew, setIsNew] = useState(true)
+
+  const [eventId, setEventId] = useState(null)
   const [isCompulsory, setCompulsory] = useState(false)
   const [eventType, setEventType] = useState('')
   const [eventName, setEventName] = useState('')
   const [eventDate, setEventDate] = useState(new Date())
+  const [hasAttendanceRecords, setHasAttendanceRecords] = useState(false)
+
+  useEffect(() => {
+    if (props.eventId) {
+      fetch(`/api/events?eventId=${props.eventId}`, { method : 'GET' }).then(async (promise) => {
+        const res = await promise.json()
+
+        setEventId(props.eventId)
+        setIsNew(false)
+        setEventType(res['type'])
+        setEventDate(new Date(res['date']))
+        setEventName(res['title'])
+        setCompulsory(res['compulsory'])
+        setHasAttendanceRecords(res['hasAttendanceRecords'])
+      })
+    }
+
+  }, [])
 
   const [submitSuccessful, setSubmitSuccessful] = useState(null)
   const [promptMessage, setPromptMessage] = useState('')
 
   const handleSubmit = () => {
     if (eventTypes.includes(eventType)) {
-      setSubmitSuccessful(1)
-      setPromptMessage("Successfully submitted!")
-
       const eventSave = {
+        _id: eventId,
         title: eventName,
         type: eventType,
         date: eventDate,
-        compulsory: isCompulsory
+        hasAttendanceRecords: hasAttendanceRecords,
       }
 
       const reqOptions = {
@@ -58,13 +78,33 @@ export default function EventForm(props) {
         const res = await promise
 
         if (res.statusCode === 500) {
-          throw new Error("An error occurred when trying to save new event")
+
+          if (isNew) {
+            setSubmitSuccessful(0)
+            setPromptMessage("Failed to create new event")
+            setTimeout(() => setPromptMessage(''), 3000)
+          } else {
+            setSubmitSuccessful(0)
+            setPromptMessage("Failed to edit event")
+            setTimeout(() => setPromptMessage(''), 3000)
+          }
+
+          throw new Error("An error occurred when trying to save event")
         } else {
-          setSubmitSuccessful(1)
-          setPromptMessage("Successfully submitted new event!")
-          setTimeout(() => setPromptMessage(''), 3000)
+
+          if (isNew) {
+            setSubmitSuccessful(1)
+            setPromptMessage("Successfully submitted new event!")
+            setTimeout(() => setPromptMessage(''), 3000)
+          } else {
+            setSubmitSuccessful(1)
+            setPromptMessage("Successfully edited an existing event!")
+            setTimeout(() => setPromptMessage(''), 3000)
+          }
+
         }
       })
+
     } else {
       setSubmitSuccessful(0)
       setPromptMessage("Invalid event type!")
@@ -84,7 +124,7 @@ export default function EventForm(props) {
   return (
     <FormPaper
       className={props.className}
-      formTitle={"Create a new event"}
+      formTitle={isNew ? "Create a new event" : "Edit an existing event" }
       handleSubmit={handleSubmit}
       promptMessage={promptMessage}
       submitSuccess={submitSuccessful}
@@ -105,22 +145,22 @@ export default function EventForm(props) {
       </Grid>
       <Grid item xs={6}>
         <TextField
-          className={classes.textFieldInput} required={true} label="Event Date" type="date"
-          defaultValue={getDisplayDate(eventDate)} onChangeCapture={(e) => setEventDate(getDateFromDisplay(e.target.value))}
+          className={classes.textFieldInput} required={true} label="Event Date" type="date" value={getDisplayDate(eventDate)}
+          onChangeCapture={(e) => setEventDate(getDateFromDisplay(e.target.value))}
         />
       </Grid>
 
-      <Grid item xs={12}>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={isCompulsory} onChange={() => {setCompulsory(!isCompulsory)}}
-              name="checkedB" color="primary"
-            />
-          }
-          label="Compulsory Attendance"
-        />
-      </Grid>
+      {/*<Grid item xs={12}>*/}
+      {/*  <FormControlLabel*/}
+      {/*    control={*/}
+      {/*      <Checkbox*/}
+      {/*        checked={isCompulsory} onChange={() => {setCompulsory(!isCompulsory)}}*/}
+      {/*        name="checkedB" color="primary"*/}
+      {/*      />*/}
+      {/*    }*/}
+      {/*    label="Compulsory Attendance"*/}
+      {/*  />*/}
+      {/*</Grid>*/}
     </FormPaper>
   );
 }

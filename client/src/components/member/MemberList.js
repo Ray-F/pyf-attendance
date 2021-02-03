@@ -7,6 +7,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import { getAttendanceColour, getCapacityColour } from "../../utils/CapacityUtils";
 import AttendanceByMemberOverTime from "./graphs/AttendanceByMemberOverTime";
 import CapacityByMemberOverTime from "./graphs/CapacityByMemberOverTime";
+import { Link } from "react-router-dom";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -15,12 +16,12 @@ const useStyles = makeStyles((theme) => ({
   },
 
   dataGridContainer: {
-    height: 650,
+    height: 1000,
     width: '100%'
   },
 
   dataGrid: {
-    minHeight: 520,
+    minHeight: 850,
     margin: `${theme.spacing(2)}px 0`
   },
 
@@ -167,7 +168,7 @@ export default function MemberList(props) {
   const columns = [
     {
       field: 'name', headerName: 'Member Name', description: 'Name of the member',
-      sortable: true, sortDirection: 'asc', disableColumnMenu: true, width: 160
+      sortable: true, disableColumnMenu: true, width: 160
     },
     {
       field: 'attendanceAvg', headerName: 'A %', description: 'Average attendance percentage',
@@ -204,22 +205,27 @@ export default function MemberList(props) {
           <Box className={classes.optionIconContainer}>
             <IconButton onClick={() => handleViewMember(params.getValue("id"))}><VisibilityIcon /></IconButton>
             <Divider orientation="vertical" flexItem />
-            <IconButton><EditIcon /></IconButton>
+
+            <Link to={`/members/add?memberId=${params.getValue('id')}`}>
+              <IconButton><EditIcon /></IconButton>
+            </Link>
           </Box>
         )
       }
     }
   ]
 
-  const rows = members.map((member, index) => {
+  const rows = members.filter(member =>
+    member.endDate === undefined || new Date(member.endDate) > new Date()
+  ).map(member => {
     return {
       id: member._id,
       name: member.fullName,
       attendanceAvg: member.attendanceAvg,
       capacityAvg: member.capacityAvg,
-      meetingsAttended: member.meetingsAttended
+      meetingsAttended: member.meetingsAttended,
     }
-  })
+  }).sort((a, b) => a.name.localeCompare(b.name))
 
   return (
     <Container maxWidth={'lg'} className={classes.container}>
@@ -232,7 +238,7 @@ export default function MemberList(props) {
             <DataGrid className={classes.dataGrid}
                       columns={columns} rows={rows}
                       rowHeight={40} headerHeight={50}
-                      pageSize={10}
+                      pageSize={25}
             />
           </DisplayPaper>
         </Grid>

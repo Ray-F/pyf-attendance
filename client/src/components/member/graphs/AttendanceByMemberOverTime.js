@@ -36,7 +36,7 @@ function AttendanceByMemberOverTime(props) {
     <Plot height={props.height} plotTitle={`${props.memberName}'s attendance over time`}>
 
       <LineSeries data={meetingData} style={{ strokeWidth: 2 }} />
-      <LineSeries data={line} style={{ strokeWidth: 1 }} strokeStyle={'dashed'} />
+      <LineSeries data={line} style={{ strokeWidth: 1, strokeDasharray: [2, 5], stroke: '#333' }} strokeStyle={'dashed'} />
 
       <XAxis title={"Time"} position={"middle"} />
       <YAxis title="Attendance %"  position={"middle"} />

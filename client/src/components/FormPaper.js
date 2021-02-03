@@ -30,7 +30,7 @@ export default function FormPaper(props) {
   return (
     <DisplayPaper className={props.className} formTitle={props.formTitle}>
 
-      <Grid container xs={12} spacing={2}>
+      <Grid container spacing={2}>
         {props.children}
 
         <Grid item xs={12}>

@@ -27,7 +27,7 @@ export default function HomePage() {
 
   function buttonFactory(link, text) {
     return (
-      <Grid item xs={6} sm={3}>
+      <Grid item xs={6} sm={4}>
         <Link to={link} className={classes.link}>
           <Button className={classes.actionButton} variant={'outlined'} color={'primary'}>{text}</Button>
         </Link>
@@ -44,7 +44,7 @@ export default function HomePage() {
         {buttonFactory("/events", "Events Dashboard")}
         {buttonFactory("/events/add", "Quick Action: Add an event")}
         {buttonFactory("/members", "Members Dashboard")}
-        {buttonFactory("/members/add", "Quick Action: Add a member")}
+        {buttonFactory("/members/add", "Quick Action:\n Add a member")}
         {buttonFactory("/attendance", "Attendance Dashboard")}
       </Grid>
     </Container>

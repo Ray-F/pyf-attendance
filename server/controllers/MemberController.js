@@ -6,20 +6,23 @@ const {
 
 
 const getMembers = async (req, res, next) => {
-  const members = await getMembersFromDb();
-
-  const membersWithIndex = members.map((item, index) => {
-    item.number = index
-    return item
-  });
-
-  res.json(membersWithIndex)
+  if (req.query.memberId !== undefined) {
+    res.json(await getMembersFromDb(req.query.memberId))
+  } else {
+    res.json(await getMembersFromDb())
+  }
 }
 
 const saveMember = async (req, res, next) => {
   let memberObject = req.body
+
   memberObject.startDate = new Date(memberObject.startDate)
   memberObject.leadershipStartDate = new Date(memberObject.leadershipStartDate)
+
+  if (memberObject.endDate !== undefined) {
+    memberObject.endDate = new Date(memberObject.endDate)
+  }
+
   await saveMemberToDb(memberObject)
 
   res.sendStatus(200)

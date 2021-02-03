@@ -7,7 +7,13 @@ const {
 
 
 const getEvents = async (req, res, next) => {
-  const events = await getEventsFromDb()
+  let events
+  if (req.query.eventId) {
+    events = await getEventsFromDb(req.query.eventId)
+  } else {
+    events = await getEventsFromDb()
+  }
+
   return res.json(events)
 }
 
@@ -30,7 +36,6 @@ const getRecentEvents = async (req, res, next) => {
 
 const saveEvent = async (req, res, next) => {
   let eventObject = req.body
-  eventObject.hasAttendanceRecords = false
   eventObject.date = new Date(eventObject.date)
 
   await saveEventToDb(eventObject)

@@ -6,6 +6,9 @@ const {
 
 const { Attendance } = require('../models/Attendance')
 
+/**
+ * Gets all attendance records for the [eventId].
+ */
 const getAttendanceSheet = async (req, res, next) => {
   const eventId = req.query.eventId
   if (eventId) {
@@ -14,7 +17,7 @@ const getAttendanceSheet = async (req, res, next) => {
       const event = await getEventsFromDb(eventId)
 
       if (event.hasAttendanceRecords) {
-        const records = await getAttendanceRecords(event)
+        const records = await getExistingAttendanceRecords(event)
         res.json(records)
       } else {
         const newRecords = await generateNewAttendanceRecords(event)
@@ -85,7 +88,7 @@ const deleteAttendanceRecords = async (req, res, next) => {
 /**
  * Call this for an event where we already have records (i.e event.hasAttendanceRecords = `true`).
  */
-const getAttendanceRecords = async (eventObject) => {
+const getExistingAttendanceRecords = async (eventObject) => {
   const attendanceData = await getAttendanceFromDb(eventObject._id)
 
   return attendanceData.map(record => {
@@ -102,12 +105,12 @@ const generateNewAttendanceRecords = async (eventObject) => {
   return members.filter(member => {
     const startDate = new Date(member.startDate)
     const eventDate = new Date(eventObject.date)
-    const endDate = (member.endDate) ? (new Date(member.endDate)) : null
+    const endDate = (member.endDate) ? (new Date(member.endDate)) : undefined
 
-    if (endDate) {
-      return (eventDate > startDate && eventDate < endDate)
+    if (endDate !== undefined) {
+      return (eventDate >= startDate && eventDate <= endDate)
     }
-    return (eventDate > startDate)
+    return (eventDate >= startDate)
   }).map((member, index) => {
     const attendancePojo = {
       memberId: member._id,

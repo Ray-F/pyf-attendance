@@ -18,16 +18,28 @@ const attendanceCollection = () => {
  * Database access functions – depending on the parameters passed, this will determine the search return.
  */
 const getMembersFromDb = async (memberId = null) => {
-  if (memberId) return await memberCollection().findOne({ "_id": ObjectId(memberId) }).toObject();
+  if (memberId) return await memberCollection().findOne({ "_id": ObjectId(memberId) });
   return await memberCollection().find({}).toArray();
 }
 
 /**
- * Saves a member to the database
- * TODO: Change to update member with upsert on. Make member return with object ID
+ * Saves a member to the database.
  */
 const saveMemberToDb = async (memberObject) => {
-  return await memberCollection().insertOne(memberObject)
+
+  console.log(memberObject)
+
+  if (memberObject._id === null) {
+    delete memberObject._id
+  } else {
+    memberObject._id = ObjectId(memberObject._id)
+  }
+
+  const query = { _id : memberObject._id }
+  const update = { $set: memberObject }
+  const options = { upsert: true }
+
+  return await memberCollection().updateOne(query, update, options)
 }
 
 const deleteMemberFromDb = async (memberId) => {
@@ -53,7 +65,13 @@ const getEventsFromDb = async (eventId = null) => {
 }
 
 const saveEventToDb = async (eventObject) => {
-  return await eventCollection().insertOne(eventObject)
+  eventObject._id = ObjectId(eventObject._id)
+
+  const query = { _id : eventObject._id }
+  const update = { $set: eventObject }
+  const options = { upsert: true }
+
+  return await eventCollection().updateOne(query, update, options)
 }
 
 const deleteEventFromDb = async (eventId) => {

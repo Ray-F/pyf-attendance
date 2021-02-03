@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Checkbox, FormControlLabel, Grid, makeStyles, TextField } from '@material-ui/core';
 
 import FormPaper from '../FormPaper';
@@ -20,25 +20,40 @@ const useStyles =  makeStyles((theme) => ({
   }
 }))
 
-const getDate = () => {
-  const today = new Date();
-  const month = (today.getMonth() + 1).toString().padStart(2, '0')
-  const day = today.getDate().toString().padStart(2, '0')
-  const year = today.getFullYear()
-
-  return `${year}-${month}-${day}`
-}
 
 export default function MemberForm(props) {
   const classes = useStyles()
 
+  const [isNew, setIsNew] = useState(props.memberId !== undefined)
+
+  const [memberId, setMemberId] = useState(null)
   const [memberName, setMemberName] = useState('')
-  const [isLeadership, setIsLeadership] = useState(false)
-  const [leadershipStartDate, setLeadershipStartDate] = useState(new Date())
+
   const [startDate, setStartDate] = useState(new Date())
+  const [isLeaving, setIsLeaving] = useState(false)
+  const [endDate, setEndDate] = useState(new Date())
 
   const [submitSuccessful, setSubmitSuccessful] = useState(null)
   const [promptMessage, setPromptMessage] = useState('')
+
+
+  useEffect(() => {
+    if (props.memberId) {
+      fetch(`/api/members?memberId=${props.memberId}`, { method: 'GET' }).then(async (promise) => {
+        const res = await promise.json()
+
+        setIsNew(false)
+        setMemberId(props.memberId)
+        setMemberName(res['fullName'])
+        setStartDate(new Date(res['startDate']))
+
+        if (res['endDate'] !== undefined) {
+          setEndDate(new Date(res['endDate']))
+          setIsLeaving(true)
+        }
+      })
+    }
+  }, [])
 
 
   const handleSubmit = () => {
@@ -49,10 +64,13 @@ export default function MemberForm(props) {
     }
 
     const memberObject = {
+      _id: memberId,
       fullName: memberName,
       startDate: startDate,
-      isLeadership: isLeadership,
-      leadershipStartDate: leadershipStartDate
+    }
+
+    if (isLeaving) {
+      memberObject.endDate = endDate
     }
 
     const reqOptions = {
@@ -64,31 +82,42 @@ export default function MemberForm(props) {
     fetch('/api/members/add', reqOptions).then(async (promise) => {
       const res = await promise
 
-      if (res.statusCode == 500) {
+      if (res.statusCode === 500) {
         setSubmitSuccessful(0)
         setPromptMessage("Some unknown error occurred on the server")
         setTimeout(() => setPromptMessage(''), 3000)
-        throw new Error("An error occurred when trying to save new event")
+        throw new Error("An error occurred when trying to save member")
       } else {
-        setSubmitSuccessful(1)
-        setPromptMessage("Successfully added new member")
-        setTimeout(() => setPromptMessage(''), 3000)
+        if (isNew) {
+          setSubmitSuccessful(1)
+          setPromptMessage(`Successfully added new member: ${memberName}`)
+          setTimeout(() => setPromptMessage(''), 3000)
+        } else {
+          setSubmitSuccessful(1)
+          setPromptMessage(`Successfully edited current member: ${memberName}` )
+          setTimeout(() => setPromptMessage(''), 3000)
+        }
       }
     })
-
-    // do some fetching to server stuff
   }
 
-  let leadershipDateDom;
+  const handleEndDate = () => {
+    if (!isLeaving) {
+      console.log("Left")
+      setEndDate(new Date())
+    }
 
-  leadershipDateDom = !isLeadership ? null : (
+    setIsLeaving(!isLeaving)
+  }
+
+  let endDateDom = !isLeaving ? null : (
     <TextField
       className={classes.textFieldInput}
       required={true}
-      label="Leadership Start Date"
+      label="Leave Date"
       type="date"
-      defaultValue={getDisplayDate(leadershipStartDate)}
-      onChange={(e) => setLeadershipStartDate(getDateFromDisplay(e.target.value))}
+      value={getDisplayDate(endDate)}
+      onChange={(e) => setEndDate(getDateFromDisplay(e.target.value))}
     />
   )
 
@@ -101,7 +130,7 @@ export default function MemberForm(props) {
   return (
     <FormPaper
       className={props.className}
-      formTitle={"Add a new member"}
+      formTitle={props.memberId === undefined ? "Add a new member" : `Editing ${memberName}'s record` }
       promptMessage={promptMessage}
       handleSubmit={handleSubmit}
       submitSuccess={submitSuccessful}
@@ -123,7 +152,7 @@ export default function MemberForm(props) {
           required={true}
           label="Member Start Date"
           type="date"
-          defaultValue={getDisplayDate(startDate)}
+          value={getDisplayDate(startDate)}
           onChange={(e) => setStartDate(getDateFromDisplay(e.target.value))}
         />
       </Grid>
@@ -132,17 +161,17 @@ export default function MemberForm(props) {
         <FormControlLabel
           control={
             <Checkbox
-              checked={isLeadership}
-              onChange={() => setIsLeadership(!isLeadership)}
+              checked={isLeaving}
+              onChange={handleEndDate}
               color="primary"
             />
           }
-          label="Leadership Team"
+          label="Known leave date"
         />
       </Grid>
 
       <Grid item xs={6} className={classes.dedicateSpace}>
-        {leadershipDateDom}
+        {endDateDom}
       </Grid>
     </FormPaper>
   );

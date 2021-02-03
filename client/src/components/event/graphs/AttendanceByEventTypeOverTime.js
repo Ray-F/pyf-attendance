@@ -9,8 +9,8 @@ import Plot from "../../Plot";
 const useStyles = makeStyles((theme) => ({
   legend: {
     position: 'absolute',
-    right: 40,
-    top: 0
+    right: 30,
+    top: -25
   }
 }));
 
@@ -39,12 +39,12 @@ function AttendanceByEventTypeOverTime(props) {
 
       <LineSeries data={meetingData} style={{ strokeWidth: 2 }} />
       <LineSeries data={eventData} style={{ strokeWidth: 2 }} />
-      <LineSeries data={line} style={{ strokeWidth: 1 }} strokeStyle={'dashed'} />
+      <LineSeries data={line} style={{ strokeWidth: 1, strokeDasharray: [2, 5], stroke: '#333' }} strokeStyle={'dashed'} />
 
       <XAxis title={"Time"} position={"middle"} />
       <YAxis title="Attendance %"  position={"middle"} />
 
-      <DiscreteColorLegend className={classes.legend} items={[{title: "Meeting"}, {title: "Project"}]} orientation={'vertical'} />
+      <DiscreteColorLegend className={classes.legend} items={[{title: "Meeting"}, {title: "Projects / Training"}]} orientation={'vertical'} />
     </Plot>
   )
 }

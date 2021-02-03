@@ -9,6 +9,8 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit';
 import CapacityByEventTypeOverTime from "./graphs/CapacityByEventTypeOverTime";
 import { getAttendanceColour, getCapacityColour } from "../../utils/CapacityUtils";
+import { Redirect } from "react-router";
+import { Link } from "react-router-dom";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -51,6 +53,15 @@ const useStyles = makeStyles((theme) => ({
 export default function EventList(props) {
   const classes = useStyles()
   const [events, setEvents] = useState([])
+  const [refresh, setRefresh] = useState(0)
+
+  const handleDelete = (eventId) => {
+    fetch(`/api/events/delete?eventId=${eventId}`, { method: 'GET' }).then(async (promise) => {
+      const res = await promise
+
+      setRefresh(refresh + 1)
+    })
+  }
 
   useEffect(() => {
 
@@ -103,7 +114,7 @@ export default function EventList(props) {
         setEvents(eventsWithAttendanceFields)
       })
     })
-  }, [])
+  }, [refresh])
 
   const meetingAttendanceXY = events.filter((event) => (event.type === "Meeting" && event.averageAttendance !== undefined))
     .map((event) => {
@@ -113,7 +124,7 @@ export default function EventList(props) {
       }
     })
 
-  const eventAttendanceXY = events.filter((event) => (event.type === "Project" && event.averageAttendance !== undefined))
+  const eventAttendanceXY = events.filter((event) => ((event.type === "Project" || event.type === "Training") && event.averageAttendance !== undefined))
     .map((event) => {
       return {
         x: new Date(event.date),
@@ -174,12 +185,12 @@ export default function EventList(props) {
       renderCell: (params) => {
         return (
           <Box className={classes.optionIconContainer}>
-            <IconButton><EditIcon /></IconButton>
+            <Link to={`/events/add?eventId=${params.getValue('id')}`}>
+              <IconButton><EditIcon /></IconButton>
+            </Link>
             <Divider orientation="vertical" flexItem />
-            <IconButton><DeleteIcon /></IconButton>
+            <IconButton onClick={() => handleDelete(params.getValue('id'))}><DeleteIcon /></IconButton>
           </Box>
-
-
         )
       }
     }
@@ -187,7 +198,7 @@ export default function EventList(props) {
 
   const rows = events.map((event, index) => {
     return {
-      id: index,
+      id: event._id,
       name: event.title,
       type: event.type,
       date: event.date,
