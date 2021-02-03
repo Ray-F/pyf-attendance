@@ -26,7 +26,15 @@ router.get('/attendance/reset', resetAttendance)
 router.get('/attendance/delete', deleteAttendanceRecords)
 
 router.get('*', (req, res) => {
-  res.status(404).send("Error 404: Page not found")
+  res.status(200).send(
+    `
+    <h2>PYF Attendance API</h2>
+    <p>
+      You have reached the express API for PYF attendance. Ensure you have the correct permissions before attempting to use the API.
+      Email rf.raymondfeng@gmail.com for any questions on usage.
+    </p>
+  `
+  )
 })
 
 

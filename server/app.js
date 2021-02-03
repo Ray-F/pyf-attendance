@@ -15,11 +15,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // routes
-app.use(express.static(path.join(__dirname, '../client/build')))
+app.use(express.static(path.join(__dirname, '../client/build-latest')))
 app.use('/', require('./routes/MainRouter.js'));
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname + '/../client/build/index.html'))
+  res.sendFile(path.join(__dirname + '/../client/build-latest/index.html'))
 })
 
 // error handler
