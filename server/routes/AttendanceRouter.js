@@ -25,5 +25,9 @@ router.post('/attendance', saveAttendanceSheet)
 router.get('/attendance/reset', resetAttendance)
 router.get('/attendance/delete', deleteAttendanceRecords)
 
+router.get('*', (req, res) => {
+  res.status(404).send("Error 404: Page not found")
+})
+
 
 module.exports = router;

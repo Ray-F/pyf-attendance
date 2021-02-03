@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const path = require('path');
 
 const defaultController = require('../controllers/DefaultController');
 
@@ -14,19 +15,5 @@ router.get('/hello', defaultController.helloWorld);
 
 const attendanceRouter = require('./AttendanceRouter');
 router.use('/api', attendanceRouter)
-
-
-router.use("/", (req, res, next) => {
-  res.send(`
-    <h2>Express API for PYF Attendance App</h2>
-    <p>
-      You have reached the express API section.
-      Email rf.raymondfeng@gmail.com for any questions on usage.
-    </p>
-  `);
-});
-
-
-
 
 module.exports = router;
