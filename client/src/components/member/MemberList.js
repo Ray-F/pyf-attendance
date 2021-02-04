@@ -85,6 +85,7 @@ export default function MemberList(props) {
               return member
             }
 
+            member.nShouldAttend = nShouldAttend
             member.attendanceAvg = 0
             member.meetingsAttended = 0
 
@@ -96,7 +97,6 @@ export default function MemberList(props) {
             const lastAttendanceRecord = attendanceRecords[0]
             member.capacityAvg = lastAttendanceRecord.isAbsent ? 0 : lastAttendanceRecord.capacity
             member.attendanceAvg = Math.round(member.attendanceAvg / nShouldAttend * 10 * 100) / 10
-
 
             return member
           })
@@ -188,7 +188,10 @@ export default function MemberList(props) {
     },
     {
       field: 'meetingsAttended', headerName: 'Meetings Attended', description: "Meetings attended by member",
-      sortable: false, disableColumnMenu: true, width: 80
+      sortable: false, disableColumnMenu: true, width: 80,
+      renderCell: (params) => {
+        return (<Box>{params.getValue('meetingsAttended')} / {params.getValue('nShouldAttend')}</Box>)
+      }
     },
     {
       field: 'options', headerName: 'Options', sortable: false,
@@ -217,6 +220,7 @@ export default function MemberList(props) {
       attendanceAvg: member.attendanceAvg,
       capacityAvg: member.capacityAvg,
       meetingsAttended: member.meetingsAttended,
+      nShouldAttend: member.nShouldAttend
     }
   }).sort((a, b) => a.name.localeCompare(b.name))
 
