@@ -93,7 +93,7 @@ export default function MemberList(props) {
               member.meetingsAttended += (attendance.isAbsent) ? 0 : 1
             })
 
-            const lastAttendanceRecord = attendanceRecords[attendanceRecords.length - 1]
+            const lastAttendanceRecord = attendanceRecords[0]
             member.capacityAvg = lastAttendanceRecord.isAbsent ? 0 : lastAttendanceRecord.capacity
             member.attendanceAvg = Math.round(member.attendanceAvg / nShouldAttend * 10 * 100) / 10
 
