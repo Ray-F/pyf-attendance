@@ -3,7 +3,6 @@ import { makeStyles } from '@material-ui/core';
 import EventForm from '../../components/event/EventForm';
 import DisplayPaper from "../../components/DisplayPaper";
 import EventList from "../../components/event/EventList";
-import AttendanceByEventTypeOverTime from "../../components/event/graphs/AttendanceByEventTypeOverTime";
 import { useLocation } from "react-router";
 
 

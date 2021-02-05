@@ -120,7 +120,7 @@ export default function AttendanceForm(props) {
   const numberRecentEvents = 10
 
   const [attendanceData, setAttendanceData] = useState([])
-  const [currentEvent, setCurrentEvent] = useState('')
+  const [currentEvent, setCurrentEvent] = useState({})
   const [recentEvents, setRecentEvents] = useState([])
 
   const [submitSuccessful, setSubmitSuccessful] = useState(null)
@@ -136,10 +136,33 @@ export default function AttendanceForm(props) {
     })
   }, [submitSuccessful])
 
-  const handleCurrentEventChange = (newEvent) => {
+  useEffect(() => {
+    if (props.eventId !== null) {
+
+      const foundEvent = recentEvents.find(event => event._id === props.eventId)
+
+      if (foundEvent !== undefined) {
+        setCurrentEvent(foundEvent)
+      } else {
+        // Get the corresponding event and set it to current event
+        fetch(`/api/events?eventId=${props.eventId}`, { method: 'GET' }).then(async (res) => {
+          const data = await res.json()
+          setCurrentEvent(data)
+        })
+      }
+
+      // Get the corresponding attendance data and set
+      fetch(`/api/attendance?eventId=${props.eventId}`, { method: 'GET' }).then(async (res) => {
+        const data = await res.json()
+        setAttendanceData(data)
+      })
+    }
+  }, [])
+
+  const handleCurrentEventChange = (eventId) => {
     setAttendanceData([])
-    setCurrentEvent(newEvent)
-    fetch(`/api/attendance?eventId=${newEvent._id}`, { method: 'GET' }).then(async (res) => {
+    setCurrentEvent(recentEvents.find(event => event._id === eventId))
+    fetch(`/api/attendance?eventId=${eventId}`, { method: 'GET' }).then(async (res) => {
       const data = await res.json()
       setAttendanceData(data)
     })
@@ -273,10 +296,10 @@ export default function AttendanceForm(props) {
       <Grid item xs={12}>
         <FormControl required={true} className={classes.eventSelector}>
           <InputLabel id="">Select event</InputLabel>
-          <Select value={currentEvent} onChange={(e) => handleCurrentEventChange(e.target.value)}>
+          <Select value={currentEvent._id ? currentEvent._id : ""} onChange={(e) => handleCurrentEventChange(e.target.value)}>
             {recentEvents.map((event, index) => {
               return (
-                <MenuItem value={event} key={index}>{event.title} – {getNiceDate(event.date)}&nbsp;<i className={classes.newIndicator}>{event.hasAttendanceRecords ? "" : "to submit"}</i></MenuItem>
+                <MenuItem value={event._id} key={index}>{event.title} – {getNiceDate(event.date)}&nbsp;<i className={classes.newIndicator}>{event.hasAttendanceRecords ? "" : "to submit"}</i></MenuItem>
               )
             })}
           </Select>

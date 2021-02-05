@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const propTypes = {
-  className: PropTypes.object,
+  className: PropTypes.string,
   meetingData: PropTypes.array.isRequired,
   eventData: PropTypes.array.isRequired,
   height: PropTypes.number.isRequired,

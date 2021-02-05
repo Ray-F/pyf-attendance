@@ -7,6 +7,7 @@ import {
 
 import FormPaper from '../FormPaper';
 import { getDateFromDisplay, getDisplayDate } from "../../utils/DateTimeUtils";
+import { useHistory } from "react-router-dom";
 
 
 const useStyles =  makeStyles((theme) => ({
@@ -29,10 +30,11 @@ export default function EventForm(props) {
     'Project'
   ]
 
+  const history = useHistory()
+
   const [isNew, setIsNew] = useState(true)
 
   const [eventId, setEventId] = useState(null)
-  const [isCompulsory, setCompulsory] = useState(false)
   const [eventType, setEventType] = useState('')
   const [eventName, setEventName] = useState('')
   const [eventDate, setEventDate] = useState(new Date())
@@ -48,7 +50,6 @@ export default function EventForm(props) {
         setEventType(res['type'])
         setEventDate(new Date(res['date']))
         setEventName(res['title'])
-        setCompulsory(res['compulsory'])
         setHasAttendanceRecords(res['hasAttendanceRecords'])
       })
     }
@@ -95,13 +96,20 @@ export default function EventForm(props) {
           if (isNew) {
             setSubmitSuccessful(1)
             setPromptMessage("Successfully submitted new event!")
-            setTimeout(() => setPromptMessage(''), 3000)
+
+            // After add, redirect to fill in attendance form
+            fetch('/api/events', { method: 'GET' }).then(async (res) => {
+              const data = await res.json()
+              const lastRecord = data[data.length - 1]
+
+              history.push(`/attendance?eventId=${lastRecord._id}`)
+            })
+
           } else {
             setSubmitSuccessful(1)
             setPromptMessage("Successfully edited an existing event!")
             setTimeout(() => setPromptMessage(''), 3000)
           }
-
         }
       })
 
