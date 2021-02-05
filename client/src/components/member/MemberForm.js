@@ -130,7 +130,7 @@ export default function MemberForm(props) {
   return (
     <FormPaper
       className={props.className}
-      formTitle={props.memberId === undefined ? "Add a new member" : `Editing ${memberName}'s record` }
+      formTitle={(props.memberId === undefined || props.memberId === null) ? "Add a new member" : `Editing ${memberName}'s record` }
       promptMessage={promptMessage}
       handleSubmit={handleSubmit}
       submitSuccess={submitSuccessful}
