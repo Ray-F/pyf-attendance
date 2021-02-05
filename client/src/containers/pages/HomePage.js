@@ -38,7 +38,7 @@ export default function HomePage() {
   return (
     <Container className={classes.container} maxWidth={'md'}>
       <Typography variant={'h4'}>PYF Attendance Monitor</Typography>
-      <Typography variant={'body1'}>Powered by Spprax Rocket</Typography>
+      <Typography variant={'body1'}>Powered by Spprax Rocket (V1.2b)</Typography>
 
       <Grid container className={classes.buttonContainer} spacing={2}>
         {buttonFactory("/events", "Events Dashboard")}
