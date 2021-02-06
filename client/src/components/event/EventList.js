@@ -162,7 +162,7 @@ export default function EventList(props) {
     //   sortable: false, disableColumnMenu: true, width: 100
     // },
     {
-      field: 'attendanceAvg', headerName: 'A %',
+      field: 'attendanceAvg', headerName: 'A %', description: "average attendance for this event",
       sortable: true, disableColumnMenu: true, width: 60,
       renderCell: (params) => {
         const colour = getAttendanceColour(params.getValue('attendanceAvg'))
@@ -171,7 +171,7 @@ export default function EventList(props) {
       }
     },
     {
-      field: 'capacityAvg', headerName: 'Capacity',
+      field: 'capacityAvg', headerName: 'Capacity', description: "average capacity for this event",
       sortable: true, disableColumnMenu: true, width: 100, headerAlign: 'center',
       renderCell: (params) => {
         const colour = getCapacityColour(params.getValue('capacityAvg'))
