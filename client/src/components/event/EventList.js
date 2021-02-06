@@ -69,7 +69,6 @@ const useStyles = makeStyles((theme) => ({
       textDecoration: 'underline'
     }
   }
-
 }));
 
 export default function EventList(props) {
@@ -181,7 +180,6 @@ export default function EventList(props) {
               <span className={classes.recordIndicator}>{params.getValue('name')}</span>
             </Link>
           )
-
         }
       }
     },
