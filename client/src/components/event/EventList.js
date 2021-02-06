@@ -47,7 +47,29 @@ const useStyles = makeStyles((theme) => ({
   recordIndicator: {
     fontStyle: 'italic',
     color: theme.palette.primary.main
+  },
+
+  linkWithoutAttendanceRecords: {
+    color: theme.palette.primary.main,
+
+    "&:active": {
+      color: theme.palette.primary.dark
+    }
+  },
+
+  linkWithAttendanceRecords: {
+    color: 'inherit',
+    textDecoration: 'none',
+
+    "&:active": {
+      color: theme.palette.primary.dark
+    },
+
+    "&:hover": {
+      textDecoration: 'underline'
+    }
   }
+
 }));
 
 export default function EventList(props) {
@@ -146,9 +168,22 @@ export default function EventList(props) {
     {
       field: 'name', headerName: 'Event Name', description: 'Name of the event',
       sortable: false, disableColumnMenu: true, width: 160,
-      renderCell: (params) => (
-        <span className={(params.getValue('hasRecords')) ? null : classes.recordIndicator}>{params.getValue('name')}</span>
-      )
+      renderCell: (params) => {
+        if(params.getValue('hasRecords')) {
+          return (
+            <Link className={classes.linkWithAttendanceRecords} to={`/attendance?eventId=${params.getValue('id')}`}>
+              <span>{params.getValue('name')}</span>
+            </Link>
+          )
+        } else {
+          return (
+            <Link className={classes.linkWithoutAttendanceRecords} to={`/attendance?eventId=${params.getValue('id')}`}>
+              <span className={classes.recordIndicator}>{params.getValue('name')}</span>
+            </Link>
+          )
+
+        }
+      }
     },
     {
       field: 'date', headerName: 'Date',
