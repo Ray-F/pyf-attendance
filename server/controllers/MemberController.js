@@ -17,7 +17,6 @@ const saveMember = async (req, res, next) => {
   let memberObject = req.body
 
   memberObject.startDate = new Date(memberObject.startDate)
-  memberObject.leadershipStartDate = new Date(memberObject.leadershipStartDate)
 
   if (memberObject.endDate !== undefined) {
     memberObject.endDate = new Date(memberObject.endDate)
