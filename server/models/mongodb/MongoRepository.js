@@ -64,6 +64,11 @@ const getEventsFromDb = async (eventId = null) => {
   return await eventCollection().find({}).toArray()
 }
 
+// Get's events with no attendence records.
+const getEventsWithNoRecordsFromDB = async () => {
+  return await eventCollection().find({hasAttendanceRecords: false}).toArray()
+}
+
 const saveEventToDb = async (eventObject) => {
   eventObject._id = ObjectId(eventObject._id)
 
@@ -147,5 +152,5 @@ const deleteAllAttendanceFromDb = async () => {
 module.exports = {
   getEventsFromDb, saveEventToDb, setEventRecorded, deleteEventFromDb, deleteAllEventsFromDb,
   getMembersFromDb, saveMemberToDb, deleteMemberFromDb, deleteAllMembersFromDb,
-  getAttendanceFromDb, saveAttendanceToDb, deleteAttendanceFromDb, deleteAllAttendanceFromDb
+  getAttendanceFromDb, saveAttendanceToDb, deleteAttendanceFromDb, deleteAllAttendanceFromDb, getEventsWithNoRecordsFromDB
 }

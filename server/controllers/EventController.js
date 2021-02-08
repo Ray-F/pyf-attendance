@@ -2,7 +2,7 @@ const { deleteAttendanceFromDb } = require("../models/mongodb/MongoRepository");
 const { deleteEventFromDb } = require("../models/mongodb/MongoRepository");
 const {
   deleteAllEventsFromDb, saveEventToDb, getEventsFromDb,
-  deleteAllAttendanceFromDb
+  deleteAllAttendanceFromDb, getEventsWithNoRecordsFromDB
 } = require("../models/mongodb/MongoRepository");
 
 
@@ -32,6 +32,12 @@ const getRecentEvents = async (req, res, next) => {
   }
 
   res.json(sortedEvents)
+}
+
+const getEventsWithNoRecords = async (req, res, next) => {
+  let events = await getEventsWithNoRecordsFromDB()
+
+  res.json(events)
 }
 
 const saveEvent = async (req, res, next) => {
@@ -64,5 +70,5 @@ const resetEvents = async (req, res, next) => {
 
 
 module.exports = {
-  getEvents, getRecentEvents, saveEvent, deleteEvent, resetEvents
+  getEvents, getRecentEvents, saveEvent, deleteEvent, resetEvents, getEventsWithNoRecords
 }

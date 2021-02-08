@@ -1,6 +1,6 @@
 const { Router } = require('express');
 
-const { saveEvent, getEvents, getRecentEvents, deleteEvent, resetEvents } = require('../controllers/EventController')
+const { saveEvent, getEvents, getRecentEvents, deleteEvent, resetEvents, getEventsWithNoRecords } = require('../controllers/EventController')
 const { getMembers, saveMember, deleteMember, resetMembers } = require('../controllers/MemberController')
 const {
   resetAttendance, getAllAttendanceRecords, saveAttendanceSheet, getAttendanceSheet, deleteAttendanceRecords
@@ -15,6 +15,7 @@ router.get('/members/reset', resetMembers)
 
 router.get('/events', getEvents)
 router.get('/events/recent', getRecentEvents)
+router.get('/events/norecords', getEventsWithNoRecords)
 router.post('/events/add', saveEvent)
 router.get('/events/reset', resetEvents)
 router.get('/events/delete', deleteEvent)
