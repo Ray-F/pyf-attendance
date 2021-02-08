@@ -5,7 +5,6 @@ const {
   deleteAllAttendanceFromDb
 } = require("../models/mongodb/MongoRepository");
 
-
 const getEvents = async (req, res, next) => {
   let events
   if (req.query.eventId) {
@@ -16,29 +15,26 @@ const getEvents = async (req, res, next) => {
 
   return res.json(events)
 }
-
 /*
 * Returns an array of JSON objects of a given length (10 if undefined), filled firs by all events that still need submitting, with the rest
 * of the array being filled with the most recent events ordered by date.
 * */
 const getEventDashboardList = async (req, res, next) => {
 
-  // Check if an array length number has been defined and store that value, otherwise default the value to 10.
-  let number = (req.query.number !== undefined) ? req.query.number : 10
+  // Check if an array length number has been defined and store that value, otherwise default the value to 10
+  let listLength = (req.query.listLength !== undefined) ? req.query.listLength : 10
 
-  // Find & store all events from the collection.
+  // Find & store all events from the collection
   let allEvents = await getEventsFromDb()
 
-
-
-  // Find & store all events that still need submitting.
+  // Find & store all events that still need submitting
   let noRecordEvents = allEvents.filter((event) => {
-    return event.hasAttendanceRecords === false
+    return !event.hasAttendanceRecords
   })
 
-  // Find & store all events that have allready been submitted.
+  // Find & store all events that have allready been submitted
   let recordEvents = allEvents.filter((event) => {
-    return event.hasAttendanceRecords === true
+    return event.hasAttendanceRecords
   })
 
   let sortedRecordEvents = recordEvents.sort((a, b) => {
@@ -47,11 +43,11 @@ const getEventDashboardList = async (req, res, next) => {
     return (dateA > dateB) ? -1 : 1
   })
 
-  // Find how many recent events will fit into the final array, and reduce the array to only contain those objects.
-  if (noRecordEvents.length >= number) {
+  // Find how many recent events will fit into the final array, and reduce the array to only contain those objects
+  if (noRecordEvents.length >= listLength) {
     recordEvents = []
-  } else if (recordEvents.length > number - noRecordEvents.length) {
-    recordEvents = recordEvents.slice(0, number - noRecordEvents.length)
+  } else if (recordEvents.length > listLength - noRecordEvents.length) {
+    recordEvents = recordEvents.slice(0, listLength - noRecordEvents.length)
   }
 
   let currentEvent;
@@ -59,17 +55,13 @@ const getEventDashboardList = async (req, res, next) => {
   let combinedEvents = [...recordEvents, ...noRecordEvents]
 
   if (req.query.eventId !== null) {
-    let doesExist = combinedEvents.some(event => {
-      return event._id == req.query.eventId
-    })
 
+
+    // Using (==) operator here, as even._id and req.query.eventId are different types, and that is not important for the comparison.
+    const doesExist = combinedEvents.some(event => event._id == req.query.eventId)
     if (!doesExist) {
-      currentEvent = allEvents.filter(event => {
-        return event._id == req.query.eventId
-      })
-
+      currentEvent = allEvents.filter(event => event._id == req.query.eventId)
       combinedEvents = [...combinedEvents, ...currentEvent]
-
     }
   }
 

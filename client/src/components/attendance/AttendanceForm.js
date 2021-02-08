@@ -118,7 +118,7 @@ const findOldAndNew = (attendanceData, params) => {
 }
 
 export default function AttendanceForm(props) {
-  const numberRecentEvents = 10
+  const listLength = 10
 
   const [attendanceData, setAttendanceData] = useState([])
   const [currentEvent, setCurrentEvent] = useState({})
@@ -129,8 +129,10 @@ export default function AttendanceForm(props) {
 
   const classes = useStyles()
 
+  let history = useHistory()
+
   useEffect(() => {
-    fetch(`/api/events/list?number=${numberRecentEvents}&eventId=${props.eventId}`, {method: 'GET'}).then(async (res) => {
+    fetch(`/api/events/list?listLength=${listLength}&eventId=${props.eventId}`, {method: 'GET'}).then(async (res) => {
       const data = await res.json()
       setRecentEvents(data)
       setAttendanceData([])
@@ -161,9 +163,10 @@ export default function AttendanceForm(props) {
   }, [])
 
   const handleCurrentEventChange = (eventId) => {
-    if (recentEvents.find(event => event._id === eventId) !== undefined) {
+    const recentEvent = recentEvents.find(event => event._id === eventId)
+    if (recentEvent !== undefined) {
       setAttendanceData([])
-      setCurrentEvent(recentEvents.find(event => event._id === eventId))
+      setCurrentEvent(recentEvent)
       fetch(`/api/attendance?eventId=${eventId}`, {method: 'GET'}).then(async (res) => {
         const data = await res.json()
         setAttendanceData(data)
@@ -284,18 +287,13 @@ export default function AttendanceForm(props) {
     )
   }
 
-  let history = useHistory()
-
   const handleSeeAll = () => {
     history.push("/events")
   }
 
-  /**
-   * Checks if there are any Not Submitted events, and displays a section header for the dropdown list, if there are.
-   */
-
+  // Checks if there are any Not Submitted events, and displays a section header for the dropdown list, if there are.
   let submitHeader
-  if (recentEvents.some(event => event.hasAttendanceRecords === false)) {
+  if (recentEvents.some(event => !event.hasAttendanceRecords)) {
     submitHeader = <ListSubheader>Need to Submit</ListSubheader>
   }
 
@@ -315,22 +313,27 @@ export default function AttendanceForm(props) {
           <Select value={currentEvent._id ? currentEvent._id : ""} onChange={(e) => handleCurrentEventChange(e.target.value)}>
             {submitHeader}
             {recentEvents.map((event, index) => {
-              if (event.hasAttendanceRecords === false) {
+              if (!event.hasAttendanceRecords) {
                 return (
-                  <MenuItem value={event._id} key={index}>{event.title} – {getNiceDate(event.date)}&nbsp;<i className={classes.newIndicator}>{event.hasAttendanceRecords ? "" : "to submit"}</i></MenuItem>
+                  <MenuItem value={event._id}
+                            key={index}>{event.title} – {getNiceDate(event.date)}&nbsp;
+                    <i className={classes.newIndicator}>{event.hasAttendanceRecords ? "" : "to submit"}</i>
+                  </MenuItem>
                 )
               }
             })}
-            <ListSubheader>Recent Events (<Link className={null} onClick={handleSeeAll}>see more</Link>)</ListSubheader>
+            <ListSubheader>Recent Events (<Link onClick={handleSeeAll}>see more</Link>)</ListSubheader>
             {recentEvents.map((event, index) => {
-              if (event.hasAttendanceRecords === true) {
+              if (event.hasAttendanceRecords) {
                 return (
-                  <MenuItem value={event._id} key={index}>{event.title} – {getNiceDate(event.date)}&nbsp;<i className={classes.newIndicator}>{event.hasAttendanceRecords ? "" : "to submit"}</i></MenuItem>
+                  <MenuItem value={event._id}
+                            key={index}>{event.title} – {getNiceDate(event.date)}&nbsp;
+                    <i className={classes.newIndicator}>{event.hasAttendanceRecords ? "" : "to submit"}</i>
+                  </MenuItem>
                 )
               }
             })}
           </Select>
-          {/*<FormHelperText>Only showing up to {numberRecentEvents} most recent events</FormHelperText>*/}
         </FormControl>
       </Grid>
       <Grid item xs={12}>
