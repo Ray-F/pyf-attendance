@@ -2,7 +2,7 @@ const { deleteAttendanceFromDb } = require("../models/mongodb/MongoRepository");
 const { deleteEventFromDb } = require("../models/mongodb/MongoRepository");
 const {
   deleteAllEventsFromDb, saveEventToDb, getEventsFromDb,
-  deleteAllAttendanceFromDb, getEventsWithNoRecordsFromDB
+  deleteAllAttendanceFromDb
 } = require("../models/mongodb/MongoRepository");
 
 
@@ -17,6 +17,36 @@ const getEvents = async (req, res, next) => {
   return res.json(events)
 }
 
+const getEventDashboardList = async (req, res, next) => {
+  let number = req.number ? req.number : 10
+
+  let allEvents = await getEventsFromDb()
+
+  let noRecordEvents = allEvents.filter((event) => {
+    return event.hasAttendanceRecords === false
+  })
+  let noRecordEventsCount = noRecordEvents.length
+
+  let recordEvents = allEvents.filter((event) => {
+    return event.hasAttendanceRecords === true
+  })
+
+  if (recordEvents.length > number - noRecordEventsCount) {
+    recordEvents = recordEvents.slice(0, number - noRecordEventsCount)
+  }
+
+  let combinedEvents = [...noRecordEvents, ...recordEvents]
+
+  let events = combinedEvents.sort((a, b) => {
+    const dateA = new Date(a.date)
+    const dateB = new Date(b.date)
+    return (dateA > dateB) ? -1 : 1
+  })
+
+  res.json(events)
+
+}
+
 const getRecentEvents = async (req, res, next) => {
   let events = await getEventsFromDb()
   let numberToSplice = (req.query.number) ? (req.query.number) : 5
@@ -27,17 +57,9 @@ const getRecentEvents = async (req, res, next) => {
     return (dateA > dateB) ? -1 : 1
   })
 
-  if (sortedEvents.length > numberToSplice) {
-    sortedEvents = sortedEvents.slice(0, numberToSplice)
-  }
+
 
   res.json(sortedEvents)
-}
-
-const getEventsWithNoRecords = async (req, res, next) => {
-  let events = await getEventsWithNoRecordsFromDB()
-
-  res.json(events)
 }
 
 const saveEvent = async (req, res, next) => {
@@ -70,5 +92,5 @@ const resetEvents = async (req, res, next) => {
 
 
 module.exports = {
-  getEvents, getRecentEvents, saveEvent, deleteEvent, resetEvents, getEventsWithNoRecords
+  getEvents, getRecentEvents, saveEvent, deleteEvent, resetEvents, getEventDashboardList
 }

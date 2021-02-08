@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   Box, Checkbox, FormControl, FormHelperText, Grid, InputLabel,
-  makeStyles, MenuItem, Select, Slider, TextField, Typography
+  makeStyles, MenuItem, Select, Slider, TextField, Typography, ListSubheader
 } from "@material-ui/core";
 
 import FormPaper from "../FormPaper";
@@ -129,7 +129,7 @@ export default function AttendanceForm(props) {
   const classes = useStyles()
 
   useEffect(() => {
-    fetch(`/api/events/recent?number=${numberRecentEvents}`, { method: 'GET'} ).then(async (res) => {
+    fetch(`/api/events/list?number=${numberRecentEvents}`, { method: 'GET'} ).then(async (res) => {
       const data = await res.json()
       setRecentEvents(data)
       setAttendanceData([])
@@ -160,12 +160,14 @@ export default function AttendanceForm(props) {
   }, [])
 
   const handleCurrentEventChange = (eventId) => {
-    setAttendanceData([])
-    setCurrentEvent(recentEvents.find(event => event._id === eventId))
-    fetch(`/api/attendance?eventId=${eventId}`, { method: 'GET' }).then(async (res) => {
-      const data = await res.json()
-      setAttendanceData(data)
-    })
+    if(recentEvents.find(event => event._id === eventId) !== undefined) {
+      setAttendanceData([])
+      setCurrentEvent(recentEvents.find(event => event._id === eventId))
+      fetch(`/api/attendance?eventId=${eventId}`, {method: 'GET'}).then(async (res) => {
+        const data = await res.json()
+        setAttendanceData(data)
+      })
+    }
   }
 
   const handleAbsentChange = (params) => {
@@ -297,10 +299,21 @@ export default function AttendanceForm(props) {
         <FormControl required={true} className={classes.eventSelector}>
           <InputLabel id="">Select event</InputLabel>
           <Select value={currentEvent._id ? currentEvent._id : ""} onChange={(e) => handleCurrentEventChange(e.target.value)}>
+            <ListSubheader>Need to Submit</ListSubheader>
             {recentEvents.map((event, index) => {
-              return (
-                <MenuItem value={event._id} key={index}>{event.title} – {getNiceDate(event.date)}&nbsp;<i className={classes.newIndicator}>{event.hasAttendanceRecords ? "" : "to submit"}</i></MenuItem>
-              )
+              if (event.hasAttendanceRecords === false) {
+                return (
+                  <MenuItem value={event._id} key={index}>{event.title} – {getNiceDate(event.date)}&nbsp;<i className={classes.newIndicator}>{event.hasAttendanceRecords ? "" : "to submit"}</i></MenuItem>
+                )
+              }
+            })}
+            <ListSubheader>Recent Events</ListSubheader>
+            {recentEvents.map((event, index) => {
+              if (event.hasAttendanceRecords === true) {
+                return (
+                  <MenuItem value={event._id} key={index}>{event.title} – {getNiceDate(event.date)}&nbsp;<i className={classes.newIndicator}>{event.hasAttendanceRecords ? "" : "to submit"}</i></MenuItem>
+                )
+              }
             })}
           </Select>
           <FormHelperText>Only showing up to {numberRecentEvents} most recent events</FormHelperText>
