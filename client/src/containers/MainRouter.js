@@ -7,6 +7,7 @@ import MemberPage from "./pages/MemberPage";
 import EventPage from "./pages/EventPage";
 import HomePage from "./pages/HomePage";
 import BackButton from "../components/navigation/BackButton";
+import HomeButton from "../components/navigation/HomeButton"
 
 
 class MainRouter extends Component {
@@ -16,6 +17,7 @@ class MainRouter extends Component {
       <React.Fragment>
         <BrowserRouter>
           <BackButton />
+          <HomeButton />
           <Switch>
             <Route exact path={"/events/:operation?"} component={EventPage} />
             <Route path={"/members/:operation?"} component={MemberPage} />
