@@ -1,4 +1,4 @@
-# PYF Attendance Dashboard and Monitor.
+# PYF Attendance Dashboard and Monitor
 
 **Author:** Raymond Feng (<rf.raymondfeng@gmail.com>)
 
