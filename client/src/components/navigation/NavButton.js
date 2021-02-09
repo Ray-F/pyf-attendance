@@ -3,48 +3,49 @@ import { IconButton, makeStyles } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack"
 import HomeIcon from '@material-ui/icons/Home';
 import { useHistory } from "react-router-dom";
+import PropTypes from "prop-types";
 
 
 const useStyles = makeStyles((theme) => ({
-  backButton: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    margin: '10px'
-  },
-
-  homeButton: {
-    position: 'fixed',
-    top: 0,
-    left: 50,
-    margin: '10px'
+  button: {
+    display: 'block'
   }
 }))
 
 
-export default function NavButton(props) {
+const propTypes = {
+  navType: PropTypes.string,
+  label: PropTypes.string,
+  relativePath: PropTypes.string,
+  iconType: PropTypes.any
+}
+
+function NavButton(props) {
   const classes = useStyles()
-  let history = useHistory()
+  const history = useHistory()
 
-  const handleClick = () => {
-    if(props.navType === "backButton") {
-      history.goBack()
-    } else {
-      history.push('/')
-    }
-  }
-
-  if(props.navType === "backButton") {
-    return (
-        <IconButton label={'Back'} onClick={() => handleClick()} className={classes.backButton}>
+  switch (props.navType) {
+    case "back":
+      return (
+        <IconButton label={'Back'} onClick={() => history.goBack()} className={classes.backButton}>
           <ArrowBackIcon />
         </IconButton>
-    )
-  } else {
-    return (
-        <IconButton label={'Home'} onClick={() => handleClick()} className={classes.homeButton}>
+      )
+    case "home":
+      return (
+        <IconButton label={'Home'} onClick={() => history.push('/')} className={classes.button}>
           <HomeIcon />
         </IconButton>
-    )
+      )
+    default:
+      return (
+        <IconButton label={props.label} onClick={() => history.push(props.relativePath)} className={classes.button}>
+          {props.iconType}
+        </IconButton>
+      )
   }
 }
+
+NavButton.propTypes = propTypes
+
+export default NavButton
