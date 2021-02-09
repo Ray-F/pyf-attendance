@@ -132,11 +132,19 @@ export default function AttendanceForm(props) {
   let history = useHistory()
 
   useEffect(() => {
-    fetch(`/api/events/list?listLength=${listLength}&eventId=${props.eventId}`, {method: 'GET'}).then(async (res) => {
-      const data = await res.json()
-      setRecentEvents(data)
-      setAttendanceData([])
-    })
+    if(props.eventId) {
+      fetch(`/api/events/list?listLength=${listLength}&eventId=${props.eventId}`, {method: 'GET'}).then(async (res) => {
+        const data = await res.json()
+        setRecentEvents(data)
+        setAttendanceData([])
+      })
+    } else {
+      fetch(`/api/events/list?listLength=${listLength}`, {method: 'GET'}).then(async (res) => {
+        const data = await res.json()
+        setRecentEvents(data)
+        setAttendanceData([])
+      })
+    }
   }, [submitSuccessful])
 
   useEffect(() => {

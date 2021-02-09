@@ -43,20 +43,11 @@ const getEventDashboardList = async (req, res, next) => {
     return (dateA > dateB) ? -1 : 1
   })
 
-  // Find how many recent events will fit into the final array, and reduce the array to only contain those objects
-  if (noRecordEvents.length >= listLength) {
-    recordEvents = []
-  } else if (recordEvents.length > listLength - noRecordEvents.length) {
-    recordEvents = recordEvents.slice(0, listLength - noRecordEvents.length)
-  }
-
   let currentEvent;
 
-  let combinedEvents = [...recordEvents, ...noRecordEvents]
+  let combinedEvents = [...noRecordEvents, ...recordEvents].slice(0, listLength)
 
-  if (req.query.eventId !== null) {
-
-
+  if (req.query.eventId) {
     // Using (==) operator here, as even._id and req.query.eventId are different types, and that is not important for the comparison.
     const doesExist = combinedEvents.some(event => event._id == req.query.eventId)
     if (!doesExist) {
