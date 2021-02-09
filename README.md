@@ -2,7 +2,7 @@
 
 **Author:** Raymond Feng (<rf.raymondfeng@gmail.com>)
 
-**Contributors:** Michael Howell (<michael.h@pyf.org.nz>)
+**Contributors:** Michael Howell (<michael.h@nunc.co.nz>)
 
 
 ## How to use this repository
