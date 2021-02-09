@@ -118,7 +118,9 @@ const findOldAndNew = (attendanceData, params) => {
 }
 
 export default function AttendanceForm(props) {
-  const listLength = 10
+  const classes = useStyles()
+
+  const history = useHistory()
 
   const [attendanceData, setAttendanceData] = useState([])
   const [currentEvent, setCurrentEvent] = useState({})
@@ -127,43 +129,37 @@ export default function AttendanceForm(props) {
   const [submitSuccessful, setSubmitSuccessful] = useState(null)
   const [promptMessage, setPromptMessage] = useState(null)
 
-  const classes = useStyles()
+  // Max number of dropdown items to display in event selection list
+  const listLength = 10
 
-  let history = useHistory()
-
+  // Refresh list of events
   useEffect(() => {
-    if(props.eventId) {
-      fetch(`/api/events/list?listLength=${listLength}&eventId=${props.eventId}`, {method: 'GET'}).then(async (res) => {
-        const data = await res.json()
-        setRecentEvents(data)
-        setAttendanceData([])
-      })
-    } else {
-      fetch(`/api/events/list?listLength=${listLength}`, {method: 'GET'}).then(async (res) => {
-        const data = await res.json()
-        setRecentEvents(data)
-        setAttendanceData([])
-      })
-    }
+    // Extra string to append to fetch url if we want to pass an event to fetch information for as well
+    let fetchUrlAddition = props.eventId ? `&eventId=${props.eventId}` : ""
+
+    fetch(`/api/events/list?listLength=${listLength}${fetchUrlAddition}`, { method: 'GET' }).then(async (res) => {
+      const data = await res.json()
+      setRecentEvents(data)
+      setAttendanceData([])
+    })
   }, [submitSuccessful])
 
   useEffect(() => {
-    if (props.eventId !== null) {
-
+    if (props.eventId) {
       const foundEvent = recentEvents.find(event => event._id === props.eventId)
 
-      if (foundEvent !== undefined) {
+      if (foundEvent) {
         setCurrentEvent(foundEvent)
       } else {
         // Get the corresponding event and set it to current event
-        fetch(`/api/events?eventId=${props.eventId}`, {method: 'GET'}).then(async (res) => {
+        fetch(`/api/events?eventId=${props.eventId}`, { method: 'GET' }).then(async (res) => {
           const data = await res.json()
           setCurrentEvent(data)
         })
       }
 
       // Get the corresponding attendance data and set
-      fetch(`/api/attendance?eventId=${props.eventId}`, {method: 'GET'}).then(async (res) => {
+      fetch(`/api/attendance?eventId=${props.eventId}`, { method: 'GET' }).then(async (res) => {
         const data = await res.json()
         setAttendanceData(data)
       })
@@ -171,11 +167,12 @@ export default function AttendanceForm(props) {
   }, [])
 
   const handleCurrentEventChange = (eventId) => {
-    const recentEvent = recentEvents.find(event => event._id === eventId)
-    if (recentEvent !== undefined) {
+    const selectedEvent = recentEvents.find(event => event._id === eventId)
+
+    if (selectedEvent) {
       setAttendanceData([])
-      setCurrentEvent(recentEvent)
-      fetch(`/api/attendance?eventId=${eventId}`, {method: 'GET'}).then(async (res) => {
+      setCurrentEvent(selectedEvent)
+      fetch(`/api/attendance?eventId=${eventId}`, { method: 'GET' }).then(async (res) => {
         const data = await res.json()
         setAttendanceData(data)
       })
@@ -220,7 +217,7 @@ export default function AttendanceForm(props) {
   const handleSubmit = () => {
     const reqOptions = {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(attendanceData)
     }
 
@@ -247,7 +244,7 @@ export default function AttendanceForm(props) {
       field: 'isAbsent', headerName: 'Absent', description: 'Tick if the member was absent',
       width: 100, disableColumnMenu: true, sortable: false,
       renderCell: (params) => (
-        <Checkbox checked={params.getValue('isAbsent')} onClick={() => handleAbsentChange(params)}/>
+        <Checkbox checked={params.getValue('isAbsent')} onClick={() => handleAbsentChange(params)} />
       )
     },
     {
@@ -255,7 +252,7 @@ export default function AttendanceForm(props) {
       width: 100, disableColumnMenu: true, sortable: false,
       renderCell: (params) => (
         <Checkbox checked={params.getValue('isShort')} disabled={params.getValue('isAbsent')}
-                  onClick={() => handleShortChange(params)}/>
+                  onClick={() => handleShortChange(params)} />
       )
     },
     {
@@ -264,7 +261,7 @@ export default function AttendanceForm(props) {
       width: 100, disableColumnMenu: true, sortable: false,
       renderCell: (params) => (
         <Checkbox checked={params.getValue('isExcused')} onClick={() => handleExcuseChange(params)}
-                  disabled={!params.getValue('isAbsent') && !params.getValue('isShort')}/>
+                  disabled={!params.getValue('isAbsent') && !params.getValue('isShort')} />
       )
     },
     {
@@ -274,24 +271,25 @@ export default function AttendanceForm(props) {
         <TextField className={classes.reasonField}
                    disabled={!params.getValue('isExcused')}
                    defaultValue={params.getValue('excuseReason')}
-                   onBlur={(e) => handleExcuseReasonChange(e.target.value, params)}/>
+                   onBlur={(e) => handleExcuseReasonChange(e.target.value, params)} />
       )
     }
   ]
 
   if (currentEvent.type === "Meeting") {
     columns.splice(2, 0,
-      {
-        field: 'capacityCheck', headerName: 'Capacity',
-        width: 120, disableColumnMenu: true, sortable: false,
+                   {
+                     field: 'capacityCheck', headerName: 'Capacity',
+                     width: 120, disableColumnMenu: true, sortable: false,
 
-        renderCell: (params) => (
-          <Slider className={classes.slider} onChangeCommitted={(e, value) => handleCapacityChange(value, params)}
-                  disabled={params.getValue('isAbsent')}
-                  step={1} min={1} max={4} defaultValue={params.getValue('capacity')}
-                  data-capacity={params.getValue('capacity')}/>
-        )
-      }
+                     renderCell: (params) => (
+                       <Slider className={classes.slider}
+                               onChangeCommitted={(e, value) => handleCapacityChange(value, params)}
+                               disabled={params.getValue('isAbsent')}
+                               step={1} min={1} max={4} defaultValue={params.getValue('capacity')}
+                               data-capacity={params.getValue('capacity')} />
+                     )
+                   }
     )
   }
 
@@ -318,7 +316,8 @@ export default function AttendanceForm(props) {
       <Grid item xs={12}>
         <FormControl required={true} className={classes.eventSelector}>
           <InputLabel id="">Select event</InputLabel>
-          <Select value={currentEvent._id ? currentEvent._id : ""} onChange={(e) => handleCurrentEventChange(e.target.value)}>
+          <Select value={currentEvent._id ? currentEvent._id : ""}
+                  onChange={(e) => handleCurrentEventChange(e.target.value)}>
             {submitHeader}
             {recentEvents.map((event, index) => {
               if (!event.hasAttendanceRecords) {

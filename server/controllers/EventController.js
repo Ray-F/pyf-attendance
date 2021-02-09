@@ -20,49 +20,38 @@ const getEvents = async (req, res, next) => {
 * of the array being filled with the most recent events ordered by date.
 * */
 const getEventDashboardList = async (req, res, next) => {
-
   // Check if an array length number has been defined and store that value, otherwise default the value to 10
-  let listLength = (req.query.listLength !== undefined) ? req.query.listLength : 10
+  let listLength = req.query.listLength ? req.query.listLength : 10
 
-  // Find & store all events from the collection
+  // Find and store all events from the collection
   let allEvents = await getEventsFromDb()
 
-  // Find & store all events that still need submitting
-  let noRecordEvents = allEvents.filter((event) => {
-    return !event.hasAttendanceRecords
-  })
+  // Find and store all events where attendance records still need to be submitted and sort these by date
+  // We sort these by date is so that when taking the first 10 events, these are the most recent events
+  let noRecordEvents = allEvents
+    .filter(event => !event.hasAttendanceRecords)
+    .sort((a, b) => new Date(a.date) > new Date(b.date) ? -1 : 1)
 
-  // Find & store all events that have allready been submitted
-  let recordEvents = allEvents.filter((event) => {
-    return event.hasAttendanceRecords
-  })
-
-  let sortedRecordEvents = recordEvents.sort((a, b) => {
-    const dateA = new Date(a.date)
-    const dateB = new Date(b.date)
-    return (dateA > dateB) ? -1 : 1
-  })
-
-  let currentEvent;
+  // Find and store all events that have attendance records and sort these by date
+  let recordEvents = allEvents
+    .filter(event => event.hasAttendanceRecords)
+    .sort((a, b) => new Date(a.date) > new Date(b.date) ? -1 : 1)
 
   let combinedEvents = [...noRecordEvents, ...recordEvents].slice(0, listLength)
 
   if (req.query.eventId) {
-    // Using (==) operator here, as even._id and req.query.eventId are different types, and that is not important for the comparison.
-    const doesExist = combinedEvents.some(event => event._id == req.query.eventId)
+    // Check if the requested eventId exists inside the current list of events, and if not, add the event
+    const doesExist = combinedEvents.some(event => event._id.toString() === req.query.eventId)
     if (!doesExist) {
-      currentEvent = allEvents.filter(event => event._id == req.query.eventId)
-      combinedEvents = [...combinedEvents, ...currentEvent]
+      let currentEvent = allEvents.find(event => event._id.toString() === req.query.eventId)
+      if (currentEvent) {
+        combinedEvents.push(currentEvent)
+      }
     }
   }
 
-  let events = combinedEvents.sort((a, b) => {
-    const dateA = new Date(a.date)
-    const dateB = new Date(b.date)
-    return (dateA > dateB) ? -1 : 1
-  })
-
-  res.json(events)
+  const sortedEvents = combinedEvents.sort((a, b) => new Date(a.date) > new Date(b.date) ? -1 : 1)
+  res.json(sortedEvents)
 }
 
 const getRecentEvents = async (req, res, next) => {

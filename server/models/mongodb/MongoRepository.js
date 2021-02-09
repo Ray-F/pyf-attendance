@@ -58,6 +58,8 @@ const deleteAllMembersFromDb = async () => {
 
 /**
  * Gets all events from database.
+ *
+ * @returns Promise<Array>
  */
 const getEventsFromDb = async (eventId = null) => {
   if (eventId) return await eventCollection().findOne({ "_id": ObjectId(eventId) });
