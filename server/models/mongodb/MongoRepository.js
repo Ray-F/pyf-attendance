@@ -23,23 +23,26 @@ const getMembersFromDb = async (memberId = null) => {
 }
 
 /**
- * Saves a member to the database.
+ * Saves a `memberObject` to the database.
+ *
+ * If `memberObject._id` exists, this will edit the member on the database instead of creating a new one.
  */
 const saveMemberToDb = async (memberObject) => {
-
-  console.log(memberObject)
-
-  if (memberObject._id === null) {
-    delete memberObject._id
-  } else {
+  // If an member ID was passed to this function, then update existing record
+  if (memberObject._id) {
     memberObject._id = ObjectId(memberObject._id)
+
+    const query = { _id: memberObject._id }
+    const update = { $set: memberObject }
+    const options = { upsert: false }
+
+    return await memberCollection().updateOne(query, update, options)
+  } else {
+    // Delete the record from the member object to prevent a null _id from being saved to database
+    delete memberObject._id
+
+    return await memberCollection().insertOne(memberObject)
   }
-
-  const query = { _id : memberObject._id }
-  const update = { $set: memberObject }
-  const options = { upsert: true }
-
-  return await memberCollection().updateOne(query, update, options)
 }
 
 const deleteMemberFromDb = async (memberId) => {
