@@ -32,6 +32,17 @@ server.on('error', onError);
 server.on('listening', onListening);
 
 /**
+ * If running a CI build, stop process after 5 seconds.
+ */
+setTimeout(() => {
+  if (process.env.CI) {
+    console.info("no errors, finishing with exit code 0")
+    process.exit(0)
+  }
+}, 5000)
+
+
+/**
  * Normalize a port into a number, string, or false.
  */
 
