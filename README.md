@@ -1,6 +1,5 @@
 # PYF Attendance Dashboard and Monitor
-![Continuous Integration Test](https://github.com/Ray-F/pyf-attendance/workflows/Continuous%20Integration%20Test/badge.svg?branch=master&event=pull_request)
-
+![Continuous Integration Test](https://github.com/Ray-F/pyf-attendance/workflows/Continuous%20Integration%20Test/badge.svg?branch=master&event=push)
 
 **Author:** Raymond Feng (<rf.raymondfeng@gmail.com>)
 
