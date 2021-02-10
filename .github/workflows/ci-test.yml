@@ -22,7 +22,9 @@ jobs:
         run: cd client && npm install
 
       - name: Run build script
-        run: cd client && npm run-script build --watchAll=false --ci=false
+        run: cd client && npm run-script build
+        env:
+          CI: ""
 
   back-end:
     name: Start node server on production
@@ -35,18 +37,13 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v1
 
-      - name: Set private keys for production environment
-        uses: SpicyPizza/create-envfile@v1.0
-        with:
-          envkey_MONGODB_URI_PROD: ${{ secrets.MONGODB_URI_PROD }}
-          envkey_ENV: PROD
-          envkey_CI: true
-          envkey_PORT: 9001
-          directory: server
-          file_name: .env
-
       - name: Install node dependencies
         run: cd server && npm install
 
       - name: Start node server
         run: cd server && npm run start-ci
+        env:
+          MONGODB_URI_PROD: ${{ secrets.MONGODB_URI_PROD }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          CI: true
+          PORT: 9001
