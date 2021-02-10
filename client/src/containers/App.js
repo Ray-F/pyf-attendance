@@ -1,21 +1,16 @@
-import React, { Component } from 'react';
-import {CssBaseline} from '@material-ui/core';
-import MainRouter from './MainRouter';
-
+import React from 'react';
+import { CssBaseline } from '@material-ui/core';
 import '../styling/style.scss';
-import "react-vis/dist/style.css"
+import 'react-vis/dist/style.css';
 
-class App extends Component {
+import MainRouter from "./MainRouter";
 
-  render() {
-    return (
-      <React.Fragment>
-        <CssBaseline />
-        <MainRouter />
-      </React.Fragment>
-    );
-  }
 
+export default function App() {
+  return (
+    <React.Fragment>
+      <CssBaseline />
+      <MainRouter />
+    </React.Fragment>
+  )
 }
-
-export default App;

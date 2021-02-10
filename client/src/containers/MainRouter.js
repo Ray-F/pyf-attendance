@@ -2,9 +2,9 @@ import React from 'react';
 import {BrowserRouter, Switch, Route} from 'react-router-dom';
 import { Box, makeStyles } from "@material-ui/core";
 
-import AttendancePage from './pages/AttendancePage';
-import MemberPage from "./pages/MemberPage";
 import EventPage from "./pages/EventPage";
+import MemberPage from "./pages/MemberPage";
+import AttendancePage from "./pages/AttendancePage";
 import HomePage from "./pages/HomePage";
 import NavButton from "../components/navigation/NavButton";
 
