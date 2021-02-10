@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useHistory } from "react-router-dom";
 import {
   Box, Checkbox, FormControl, FormHelperText, Grid, InputLabel,
-  makeStyles, MenuItem, Select, Slider, TextField, Typography
+  makeStyles, MenuItem, Select, Slider, TextField, Typography, ListSubheader, Link, Button
 } from "@material-ui/core";
 
 import FormPaper from "../FormPaper";
@@ -117,7 +118,9 @@ const findOldAndNew = (attendanceData, params) => {
 }
 
 export default function AttendanceForm(props) {
-  const numberRecentEvents = 10
+  const classes = useStyles()
+
+  const history = useHistory()
 
   const [attendanceData, setAttendanceData] = useState([])
   const [currentEvent, setCurrentEvent] = useState({})
@@ -126,10 +129,15 @@ export default function AttendanceForm(props) {
   const [submitSuccessful, setSubmitSuccessful] = useState(null)
   const [promptMessage, setPromptMessage] = useState(null)
 
-  const classes = useStyles()
+  // Max number of dropdown items to display in event selection list
+  const listLength = 10
 
+  // Refresh list of events
   useEffect(() => {
-    fetch(`/api/events/recent?number=${numberRecentEvents}`, { method: 'GET'} ).then(async (res) => {
+    // Extra string to append to fetch url if we want to pass an event to fetch information for as well
+    let fetchUrlAddition = props.eventId ? `&eventId=${props.eventId}` : ""
+
+    fetch(`/api/events/list?listLength=${listLength}${fetchUrlAddition}`, { method: 'GET' }).then(async (res) => {
       const data = await res.json()
       setRecentEvents(data)
       setAttendanceData([])
@@ -137,11 +145,10 @@ export default function AttendanceForm(props) {
   }, [submitSuccessful])
 
   useEffect(() => {
-    if (props.eventId !== null) {
-
+    if (props.eventId) {
       const foundEvent = recentEvents.find(event => event._id === props.eventId)
 
-      if (foundEvent !== undefined) {
+      if (foundEvent) {
         setCurrentEvent(foundEvent)
       } else {
         // Get the corresponding event and set it to current event
@@ -160,12 +167,16 @@ export default function AttendanceForm(props) {
   }, [])
 
   const handleCurrentEventChange = (eventId) => {
-    setAttendanceData([])
-    setCurrentEvent(recentEvents.find(event => event._id === eventId))
-    fetch(`/api/attendance?eventId=${eventId}`, { method: 'GET' }).then(async (res) => {
-      const data = await res.json()
-      setAttendanceData(data)
-    })
+    const selectedEvent = recentEvents.find(event => event._id === eventId)
+
+    if (selectedEvent) {
+      setAttendanceData([])
+      setCurrentEvent(selectedEvent)
+      fetch(`/api/attendance?eventId=${eventId}`, { method: 'GET' }).then(async (res) => {
+        const data = await res.json()
+        setAttendanceData(data)
+      })
+    }
   }
 
   const handleAbsentChange = (params) => {
@@ -250,7 +261,7 @@ export default function AttendanceForm(props) {
       width: 100, disableColumnMenu: true, sortable: false,
       renderCell: (params) => (
         <Checkbox checked={params.getValue('isExcused')} onClick={() => handleExcuseChange(params)}
-                  disabled={!params.getValue('isAbsent') && !params.getValue('isShort')}/>
+                  disabled={!params.getValue('isAbsent') && !params.getValue('isShort')} />
       )
     },
     {
@@ -266,22 +277,31 @@ export default function AttendanceForm(props) {
   ]
 
   if (currentEvent.type === "Meeting") {
-
-
     columns.splice(2, 0,
-      {
-        field: 'capacityCheck', headerName: 'Capacity',
-        width: 120, disableColumnMenu: true, sortable: false,
+                   {
+                     field: 'capacityCheck', headerName: 'Capacity',
+                     width: 120, disableColumnMenu: true, sortable: false,
 
-        renderCell: (params) => (
-          <Slider className={classes.slider} onChangeCommitted={(e, value) => handleCapacityChange(value, params)}
-                  disabled={params.getValue('isAbsent')}
-                  step={1} min={1} max={4} defaultValue={params.getValue('capacity')} data-capacity={params.getValue('capacity')} />
-        )
-      }
+                     renderCell: (params) => (
+                       <Slider className={classes.slider}
+                               onChangeCommitted={(e, value) => handleCapacityChange(value, params)}
+                               disabled={params.getValue('isAbsent')}
+                               step={1} min={1} max={4} defaultValue={params.getValue('capacity')}
+                               data-capacity={params.getValue('capacity')} />
+                     )
+                   }
     )
   }
 
+  const handleSeeAll = () => {
+    history.push("/events")
+  }
+
+  // Checks if there are any Not Submitted events, and displays a section header for the dropdown list, if there are.
+  let submitHeader
+  if (recentEvents.some(event => !event.hasAttendanceRecords)) {
+    submitHeader = <ListSubheader>Need to Submit</ListSubheader>
+  }
 
   /**
    * Fetches list of events, select event on that day (must be on the same day, or future event)
@@ -296,14 +316,31 @@ export default function AttendanceForm(props) {
       <Grid item xs={12}>
         <FormControl required={true} className={classes.eventSelector}>
           <InputLabel id="">Select event</InputLabel>
-          <Select value={currentEvent._id ? currentEvent._id : ""} onChange={(e) => handleCurrentEventChange(e.target.value)}>
+          <Select value={currentEvent._id ? currentEvent._id : ""}
+                  onChange={(e) => handleCurrentEventChange(e.target.value)}>
+            {submitHeader}
             {recentEvents.map((event, index) => {
-              return (
-                <MenuItem value={event._id} key={index}>{event.title} – {getNiceDate(event.date)}&nbsp;<i className={classes.newIndicator}>{event.hasAttendanceRecords ? "" : "to submit"}</i></MenuItem>
-              )
+              if (!event.hasAttendanceRecords) {
+                return (
+                  <MenuItem value={event._id}
+                            key={index}>{event.title} – {getNiceDate(event.date)}&nbsp;
+                    <i className={classes.newIndicator}>{event.hasAttendanceRecords ? "" : "to submit"}</i>
+                  </MenuItem>
+                )
+              }
+            })}
+            <ListSubheader>Recent Events (<Link onClick={handleSeeAll}>see more</Link>)</ListSubheader>
+            {recentEvents.map((event, index) => {
+              if (event.hasAttendanceRecords) {
+                return (
+                  <MenuItem value={event._id}
+                            key={index}>{event.title} – {getNiceDate(event.date)}&nbsp;
+                    <i className={classes.newIndicator}>{event.hasAttendanceRecords ? "" : "to submit"}</i>
+                  </MenuItem>
+                )
+              }
             })}
           </Select>
-          <FormHelperText>Only showing up to {numberRecentEvents} most recent events</FormHelperText>
         </FormControl>
       </Grid>
       <Grid item xs={12}>
