@@ -1,17 +1,17 @@
 const mongoClient = require('./MongoConnection')
 const ObjectId = require('mongodb').ObjectId
-
+const config = require('../../utils/config')
 
 const memberCollection = () => {
-  return mongoClient.db("pyf-attendance").collection("members")
+  return mongoClient.db(config.DB_NAME).collection("members")
 }
 
 const eventCollection = () => {
-  return mongoClient.db("pyf-attendance").collection("events")
+  return mongoClient.db(config.DB_NAME).collection("events")
 }
 
 const attendanceCollection = () => {
-  return mongoClient.db("pyf-attendance").collection("attendance")
+  return mongoClient.db(config.DB_NAME).collection("attendance")
 }
 
 /**
