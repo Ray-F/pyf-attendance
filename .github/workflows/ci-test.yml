@@ -45,5 +45,6 @@ jobs:
         env:
           MONGODB_URI_PROD: ${{ secrets.MONGODB_URI_PROD }}
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          ENV: PROD
           CI: true
           PORT: 9001
