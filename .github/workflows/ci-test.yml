@@ -1,0 +1,50 @@
+name: Continuous Integration Test
+
+on:
+  push:
+    branches: master
+  pull_request:
+    branches: master
+
+jobs:
+  front-end:
+    name: Build react client
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2.3.4
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+
+      - name: Install node dependencies
+        run: cd client && npm install
+
+      - name: Run build script
+        run: cd client && npm run-script build
+        env:
+          CI: ""
+
+  back-end:
+    name: Start node server on production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2.3.4
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+
+      - name: Install node dependencies
+        run: cd server && npm install
+
+      - name: Start node server
+        run: cd server && npm run start-ci
+        env:
+          MONGODB_URI_PROD: ${{ secrets.MONGODB_URI_PROD }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          ENV: PROD
+          CI: true
+          PORT: 9001
