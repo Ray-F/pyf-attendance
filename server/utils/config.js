@@ -1,5 +1,5 @@
-const dotenv = require('dotenv');
-dotenv.config();
+const dotenv = require('dotenv')
+dotenv.config()
 
 // Enum of the different environments
 const Environment = {
@@ -19,10 +19,14 @@ const DatabaseUri = {
 // Database configuration dependent on our current environment
 const DB_URI = (ENV === Environment.DEV) ? DatabaseUri.DEV : DatabaseUri.PROD
 const DB_NAME = (ENV === Environment.DEV) ? "pyf-attendance-dev" : "pyf-attendance"
+const PORT = process.env.PORT || 9002
+const CI_BUILD = process.env.CI === "true" || process.env.CI === "1"
 
 
 module.exports = {
   ENV,
   DB_URI,
-  DB_NAME
+  DB_NAME,
+  PORT,
+  CI_BUILD
 }
