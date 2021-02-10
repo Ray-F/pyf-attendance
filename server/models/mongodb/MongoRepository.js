@@ -1,6 +1,6 @@
 const mongoClient = require('./MongoConnection')
 const ObjectId = require('mongodb').ObjectId
-const config = require('../../utils/config')
+const config = require('../../utils/Config')
 
 const memberCollection = () => {
   return mongoClient.db(config.DB_NAME).collection("members")
