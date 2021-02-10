@@ -4,7 +4,8 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "nodemon ./bin/www",
+    "start-ci": "node ./bin/www"
   },
   "dependencies": {
     "aws-sdk": "^2.756.0",
