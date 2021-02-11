@@ -20,6 +20,9 @@ const deploy = async (req, res, next) => {
     return
   }
 
+  // new version number from GitHub
+  const newVersion = req.body.head_commit.message.split(' ').slice(-1)[0]
+
   // Webhook secret
   const secret = process.env.GH_WEBHOOK_SECRET
 
@@ -29,7 +32,7 @@ const deploy = async (req, res, next) => {
   const checksum = Buffer.from(signature, 'utf8')
 
   if (checksum.length === digest.length && crypto.timingSafeEqual(digest, checksum)) {
-    res.status(200).send("Successfully issued deployment command")
+    res.status(200).send(`Successfully issued deployment command for release version ${newVersion}`)
 
     // Execute rebuild script
     shell.exec('../scripts/build.sh')
