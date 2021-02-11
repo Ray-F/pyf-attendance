@@ -2,6 +2,10 @@ const crypto = require('crypto')
 const config = require('../utils/Config')
 const shell = require('shelljs')
 
+/**
+ * Automatically deploys the latest changes to the web server. This function will only return 200 success if run
+ * on the web server, and when sent a request via Github Webhook.
+ */
 const deploy = async (req, res, next) => {
   const payload = JSON.stringify(req.body)
   const signature = req.get('X-Hub-Signature-256')
@@ -37,6 +41,9 @@ const deploy = async (req, res, next) => {
     // Execute rebuild script
     console.log("\n\n[SERVER] Deploying new version:".yellow, newVersion.bold)
     shell.exec('../scripts/build.sh')
+
+    // Exit this current instance of the server so that PM2 can automatically restart
+    process.exit(0)
   } else {
     res.status(403).send("Secrets do not match")
   }
