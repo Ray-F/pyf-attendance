@@ -1,5 +1,6 @@
 const crypto = require('crypto')
 const config = require('../utils/Config')
+const shell = require('shelljs')
 
 const deploy = async (req, res, next) => {
   const payload = JSON.stringify(req.body)
@@ -21,7 +22,8 @@ const deploy = async (req, res, next) => {
   if (checksum.length === digest.length && crypto.timingSafeEqual(digest, checksum)) {
     res.status(200).send("Successfully issued deployment command")
 
-    // Successful, do something awesome with deployment
+    // Execute rebuild script
+    shell.exec('echo "hello world!"')
   } else {
     res.status(403).send("Secrets do not match")
   }
