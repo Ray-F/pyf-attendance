@@ -1,6 +1,7 @@
 import React from 'react'
 import { Button, Container, Grid, makeStyles, Typography } from "@material-ui/core";
 import { Link } from "react-router-dom";
+import { version } from '../../../package.json'
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -38,7 +39,8 @@ export default function HomePage() {
   return (
     <Container className={classes.container} maxWidth={'md'}>
       <Typography variant={'h4'}>PYF Attendance Monitor</Typography>
-      <Typography variant={'body1'}>Powered by Spprax Rocket (V1.5b)</Typography>
+      {console.log(process.env)}
+      <Typography variant={'body1'}>Powered by Spprax Rocket (v{version})</Typography>
 
       <Grid container className={classes.buttonContainer} spacing={2}>
         {buttonFactory("/events", "Events Dashboard")}

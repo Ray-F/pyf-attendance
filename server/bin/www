@@ -10,9 +10,10 @@ const http = require('http')
 
 // Get port from environment file
 const port = normalizePort(config.PORT)
+app.set('port', port)
 console.log(`\n[SERVER] ${config.ENV.bold} server hosted on port:`, port.toString().yellow)
 console.log("[SERVER] CI set to:", (config.CI_BUILD).toString().yellow)
-app.set('port', port)
+console.log("[SERVER] Running application version:", process.env.npm_package_version.yellow, "\n")
 
 // Create the HTTP server and set function actions when events happen
 const server = http.createServer(app)
