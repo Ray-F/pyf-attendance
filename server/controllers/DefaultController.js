@@ -23,7 +23,7 @@ const deploy = async (req, res, next) => {
     res.status(200).send("Successfully issued deployment command")
 
     // Execute rebuild script
-    shell.exec('echo "hello world!"')
+    shell.exec('ls')
   } else {
     res.status(403).send("Secrets do not match")
   }
