@@ -3,6 +3,7 @@
 VERSION=$1
 
 # Exit immediately if a command fails
+set -e
 
 if [[ "$VERSION" == "" ]]
 then
