@@ -2,9 +2,7 @@ name: CI Test
 
 on:
   push:
-    branches: master
-  pull_request:
-    branches: master
+    branches: [dev, master]
 
 jobs:
   front-end:
