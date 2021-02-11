@@ -35,6 +35,7 @@ const deploy = async (req, res, next) => {
     res.status(200).send(`Successfully issued deployment command for release version ${newVersion}`)
 
     // Execute rebuild script
+    console.log("\n\n[SERVER] Deploying new version:".yellow, newVersion.bold)
     shell.exec('../scripts/build.sh')
   } else {
     res.status(403).send("Secrets do not match")

@@ -4,6 +4,7 @@ require('colors')
 
 // Dependencies for the web application
 const config = require('../utils/Config')
+const { version } = require('../package.json')
 const app = require('../app')
 const debug = require('debug')
 const http = require('http')
@@ -13,7 +14,7 @@ const port = normalizePort(config.PORT)
 app.set('port', port)
 console.log(`\n[SERVER] ${config.ENV.bold} server hosted on port:`, port.toString().yellow)
 console.log("[SERVER] CI set to:", (config.CI_BUILD).toString().yellow)
-console.log("[SERVER] Running application version:", process.env.npm_package_version.yellow, "\n")
+console.log("[SERVER] Running application version:", version.yellow, "\n")
 
 // Create the HTTP server and set function actions when events happen
 const server = http.createServer(app)
