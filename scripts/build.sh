@@ -6,7 +6,6 @@
 git fetch
 git reset origin/master --hard
 git checkout master
-git pull
 
 # Build client and move to the right directory
 cd ../client && yarn run build
