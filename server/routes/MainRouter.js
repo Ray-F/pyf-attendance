@@ -1,13 +1,10 @@
-const { Router } = require('express');
-const path = require('path');
+const { Router } = require('express')
+const path = require('path')
 
-const defaultController = require('../controllers/DefaultController');
+const defaultController = require('../controllers/DefaultController')
 
-const router = Router();
-
-
-
-router.get('/hello', defaultController.helloWorld);
+const router = Router()
+router.post('/deploy', defaultController.deploy);
 
 // To add another router:
 // const inputRouter = require('./anotherRouter');
