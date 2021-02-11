@@ -10,6 +10,15 @@ const deploy = async (req, res, next) => {
     res.status(404).send("Payload and/or signature missing")
     return
   }
+  
+  console.log(req.body.ref)
+  if (req.body.ref !== "refs/heads/master") {
+    res.status(409).send("Push was not to master")
+    return
+  } else if (!req.body.head_commit.message.includes("[BOT] Update project version to")) {
+    res.status(409).send("Latest commit was not a release commit")
+    return
+  }
 
   // Webhook secret
   const secret = process.env.GH_WEBHOOK_SECRET
