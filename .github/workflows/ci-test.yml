@@ -36,7 +36,7 @@ jobs:
         uses: actions/setup-node@v1
 
       - name: Install node dependencies
-        run: cd client && npm install --production
+        run: cd client && npm install
 
       - name: Run build script
         run: cd client && npm run-script build
