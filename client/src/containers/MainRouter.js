@@ -20,19 +20,17 @@ export default function MainRouter() {
   const classes = useStyles();
 
   return (
-    <>
-      <BrowserRouter>
-        <Box className={classes.navContainer}>
-          <NavButton navType="back" />
-          <NavButton navType="home" />
-        </Box>
-        <Switch>
-          <Route exact path="/events/:operation?" component={EventPage} />
-          <Route path="/members/:operation?" component={MemberPage} />
-          <Route path="/attendance" component={AttendancePage} />
-          <Route path="" component={HomePage} />
-        </Switch>
-      </BrowserRouter>
-    </>
+    <BrowserRouter>
+      <Box className={classes.navContainer}>
+        <NavButton navType="back" />
+        <NavButton navType="home" />
+      </Box>
+      <Switch>
+        <Route exact path="/events/:operation?" component={EventPage} />
+        <Route path="/members/:operation?" component={MemberPage} />
+        <Route path="/attendance" component={AttendancePage} />
+        <Route path="" component={HomePage} />
+      </Switch>
+    </BrowserRouter>
   );
 }
