@@ -3,7 +3,7 @@
 
 **Author:** Raymond Feng [Ray-f](https://github.com/ray-f) (<rf.raymondfeng@gmail.com>)
 
-**Contributors:** Michael Howell [Mykhol](https://github.com/mykhol) (<michael.h@nunc.co.nz>), Matthew Ouyang [mouyang2001](https://github.com/mouyang2001)
+**Contributors:** Michael Howell [Mykhol](https://github.com/mykhol) (<michael@nunc.co.nz>), Matthew Ouyang [mouyang2001](https://github.com/mouyang2001)
 
 
 ## How to use this repository
