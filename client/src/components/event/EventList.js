@@ -103,7 +103,7 @@ export default function EventList(props) {
       fetch('/api/attendance/all', { method: 'GET' }).then(async (promise) => {
         const data = await promise.json();
 
-        if (eventsData === undefined) {
+        if (!eventsData) {
           await eventsData;
         }
 
@@ -119,7 +119,7 @@ export default function EventList(props) {
           if (nShouldAttend === 0) return event;
 
           let totalCapacity = 0;
-          const inAttendance = attendanceForEvent.filter((attendance) => attendance.isAbsent !== true);
+          const inAttendance = attendanceForEvent.filter((attendance) => !attendance.isAbsent);
           inAttendance.forEach((attendance) => {
             if (event.type === 'Meeting') {
               totalCapacity += attendance.capacity;
@@ -148,7 +148,7 @@ export default function EventList(props) {
   }, [refresh]);
 
   const meetingAttendanceXY = events.filter(
-    (event) => (event.type === 'Meeting' && event.averageAttendance !== undefined),
+    (event) => (event.type === 'Meeting' && event.averageAttendance),
   )
     .map((event) => ({
       x: new Date(event.date),
@@ -156,14 +156,14 @@ export default function EventList(props) {
     }));
 
   const eventAttendanceXY = events.filter(
-    (event) => ((event.type === 'Project' || event.type === 'Training') && event.averageAttendance !== undefined),
+    (event) => ((event.type === 'Project' || event.type === 'Training') && event.averageAttendance),
   )
     .map((event) => ({
       x: new Date(event.date),
       y: event.averageAttendance,
     }));
 
-  const meetingCapacityXY = events.filter((event) => event.type === 'Meeting' && event.averageCapacity !== undefined)
+  const meetingCapacityXY = events.filter((event) => event.type === 'Meeting' && event.averageCapacity)
     .map((event) => ({
       x0: new Date(event.date) - 1000 * 60 * 60 * 24 * 6,
       x: new Date(event.date),
