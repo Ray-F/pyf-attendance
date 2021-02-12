@@ -20,8 +20,8 @@
 1) Run `yarn run start` in the root directory
 
 
-### Needed environment file
-- Inside `server/.env`, you need the following fields to run the program
+### Required environment file
+- Create a file under `server/.env` with the following fields
 
 ```
 MONGODB_URI_DEV = <MONGODB_DEV_URI>
