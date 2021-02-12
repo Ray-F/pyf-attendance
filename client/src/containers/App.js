@@ -3,14 +3,13 @@ import { CssBaseline } from '@material-ui/core';
 import '../styling/style.scss';
 import 'react-vis/dist/style.css';
 
-import MainRouter from "./MainRouter";
-
+import MainRouter from './MainRouter';
 
 export default function App() {
   return (
-    <React.Fragment>
+    <>
       <CssBaseline />
       <MainRouter />
-    </React.Fragment>
-  )
+    </>
+  );
 }

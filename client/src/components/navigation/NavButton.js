@@ -1,57 +1,55 @@
-import React, { useEffect } from 'react'
-import { IconButton, makeStyles } from "@material-ui/core";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack"
+import React, { useEffect } from 'react';
+import { IconButton, makeStyles } from '@material-ui/core';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import HomeIcon from '@material-ui/icons/Home';
-import { useHistory } from "react-router-dom";
-import PropTypes from "prop-types";
-
+import { useHistory } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 const useStyles = makeStyles((theme) => ({
   button: {
-    display: 'block'
-  }
-}))
-
+    display: 'block',
+  },
+}));
 
 const propTypes = {
   navType: PropTypes.string,
   label: PropTypes.string,
   relativePath: PropTypes.string,
-  iconType: PropTypes.any
-}
+  iconType: PropTypes.any,
+};
 
 function NavButton(props) {
-  const classes = useStyles()
-  const history = useHistory()
+  const classes = useStyles();
+  const history = useHistory();
 
   const handleBackButton = () => {
-    if (history.location.pathname !== "/") {
-      history.goBack()
+    if (history.location.pathname !== '/') {
+      history.goBack();
     }
-  }
+  };
 
   switch (props.navType) {
-    case "back":
+    case 'back':
       return (
-        <IconButton label={'Back'} onClick={handleBackButton} className={classes.backButton}>
+        <IconButton label="Back" onClick={handleBackButton} className={classes.backButton}>
           <ArrowBackIcon />
         </IconButton>
-      )
-    case "home":
+      );
+    case 'home':
       return (
-        <IconButton label={'Home'} onClick={() => history.push('/')} className={classes.button}>
+        <IconButton label="Home" onClick={() => history.push('/')} className={classes.button}>
           <HomeIcon />
         </IconButton>
-      )
+      );
     default:
       return (
         <IconButton label={props.label} onClick={() => history.push(props.relativePath)} className={classes.button}>
           {props.iconType}
         </IconButton>
-      )
+      );
   }
 }
 
-NavButton.propTypes = propTypes
+NavButton.propTypes = propTypes;
 
-export default NavButton
+export default NavButton;
