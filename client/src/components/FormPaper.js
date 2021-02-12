@@ -1,31 +1,31 @@
-import React from 'react'
-import { Paper, makeStyles, Grid, Typography, Box, Button } from '@material-ui/core'
-import DisplayPaper from "./DisplayPaper";
+import React from 'react';
+import {
+  Paper, makeStyles, Grid, Typography, Box, Button,
+} from '@material-ui/core';
+import DisplayPaper from './DisplayPaper';
 
-
-const useStyles =  makeStyles((theme) => ({
+const useStyles = makeStyles((theme) => ({
   successCaption: {
     marginTop: 10,
     display: 'block',
-    color: '#32612D'
+    color: '#32612D',
   },
 
   errorCaption: {
     marginTop: 10,
     display: 'block',
-    color: '#992222'
+    color: '#992222',
   },
 
   requiredFields: {
     float: 'right',
     fontSize: '0.9em',
-    color: 'grey'
-  }
-}))
-
+    color: 'grey',
+  },
+}));
 
 export default function FormPaper(props) {
-  const classes = useStyles()
+  const classes = useStyles();
 
   return (
     <DisplayPaper className={props.className} formTitle={props.formTitle}>
@@ -50,7 +50,6 @@ export default function FormPaper(props) {
         </Grid>
       </Grid>
 
-
     </DisplayPaper>
-  )
+  );
 }
