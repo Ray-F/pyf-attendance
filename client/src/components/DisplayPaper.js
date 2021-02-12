@@ -21,6 +21,7 @@ const propTypes = {
   className: PropTypes.string,
   formTitle: PropTypes.string.isRequired,
 };
+
 function DisplayPaper(props) {
   const classes = useStyles();
 
