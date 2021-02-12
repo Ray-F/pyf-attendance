@@ -11,6 +11,7 @@ import CapacityByEventTypeOverTime from "./graphs/CapacityByEventTypeOverTime";
 import { getAttendanceColour, getCapacityColour } from "../../utils/CapacityUtils";
 import { Redirect } from "react-router";
 import { Link } from "react-router-dom";
+import ConfirmDialog from "../ConfirmDialog";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -75,6 +76,7 @@ export default function EventList(props) {
   const classes = useStyles()
   const [events, setEvents] = useState([])
   const [refresh, setRefresh] = useState(0)
+  const [openConfirm, setOpenConfirm] = useState(false)
 
   const handleDelete = (eventId) => {
     fetch(`/api/events/delete?eventId=${eventId}`, { method: 'GET' }).then(async (promise) => {
@@ -222,7 +224,14 @@ export default function EventList(props) {
               <IconButton><EditIcon /></IconButton>
             </Link>
             <Divider orientation="vertical" flexItem />
-            <IconButton onClick={() => handleDelete(params.getValue('id'))}><DeleteIcon /></IconButton>
+            <IconButton onClick={() => setOpenConfirm(true)}><DeleteIcon /></IconButton>
+
+            {/*<ConfirmDialog*/}
+            {/*    title="Delete Post?"*/}
+            {/*    open={openConfirm}*/}
+            {/*    setOpen={setOpenConfirm}*/}
+            {/*    onConfirm={handleDelete(params.getValue('id'))}*/}
+            {/*/>*/}
           </Box>
         )
       }
