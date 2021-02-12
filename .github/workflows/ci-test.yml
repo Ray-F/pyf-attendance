@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-node@v1
 
       - name: Install node dependencies
-        run: cd client && npm install --only=dev
+        run: cd client && npm install
 
       - name: Run ESLint
         run: cd client && npm run lint
