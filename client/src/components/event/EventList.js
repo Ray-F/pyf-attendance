@@ -16,8 +16,7 @@ import CapacityByEventTypeOverTime from './graphs/CapacityByEventTypeOverTime';
 import { getAttendanceColour, getCapacityColour } from '../../utils/CapacityUtils';
 import AttendanceByEventTypeOverTime from './graphs/AttendanceByEventTypeOverTime';
 import DisplayPaper from '../DisplayPaper';
-import ConfirmDialog from "../ConfirmDialog";
-
+import ConfirmDialog from '../ConfirmDialog';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -78,17 +77,22 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function EventList(props) {
-
-  const classes = useStyles()
-  const [events, setEvents] = useState([])
-  const [refresh, setRefresh] = useState(0)
-  const [openConfirm, setOpenConfirm] = useState(false)
+  const classes = useStyles();
+  const [events, setEvents] = useState([]);
+  const [refresh, setRefresh] = useState(0);
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [deleteId, setDeleteId] = useState('');
 
   const handleDelete = (eventId) => {
-    fetch(`/api/events/delete?eventId=${eventId}`, { method: 'GET' }).then(async (promise) => {
-      const res = await promise;
+    setOpenConfirm(true);
+    setDeleteId(eventId);
+  };
 
+  const doDelete = () => {
+    fetch(`/api/events/delete?eventId=${deleteId}`, { method: 'GET' }).then(async (promise) => {
+      const res = await promise;
       setRefresh(refresh + 1);
+      setDeleteId();
     });
   };
 
@@ -143,13 +147,17 @@ export default function EventList(props) {
     });
   }, [refresh]);
 
-  const meetingAttendanceXY = events.filter((event) => (event.type === 'Meeting' && event.averageAttendance !== undefined))
+  const meetingAttendanceXY = events.filter(
+    (event) => (event.type === 'Meeting' && event.averageAttendance !== undefined),
+  )
     .map((event) => ({
       x: new Date(event.date),
       y: event.averageAttendance,
     }));
 
-  const eventAttendanceXY = events.filter((event) => ((event.type === 'Project' || event.type === 'Training') && event.averageAttendance !== undefined))
+  const eventAttendanceXY = events.filter(
+    (event) => ((event.type === 'Project' || event.type === 'Training') && event.averageAttendance !== undefined),
+  )
     .map((event) => ({
       x: new Date(event.date),
       y: event.averageAttendance,
@@ -234,40 +242,34 @@ export default function EventList(props) {
       },
     },
     {
-      field: 'options', headerName: 'Options',
-      disableColumnMenu: true, width: 120, headerAlign: 'center',
-      renderCell: (params) => {
-        return (
-          <Box className={classes.optionIconContainer}>
-            <Link to={`/events/add?eventId=${params.getValue('id')}`}>
-              <IconButton><EditIcon /></IconButton>
-            </Link>
-            <Divider orientation="vertical" flexItem />
-            <IconButton onClick={() => setOpenConfirm(true)}><DeleteIcon /></IconButton>
+      field: 'options',
+      headerName: 'Options',
+      disableColumnMenu: true,
+      width: 120,
+      headerAlign: 'center',
+      renderCell: (params) => (
+        <Box className={classes.optionIconContainer}>
+          <Link to={`/events/add?eventId=${params.getValue('id')}`}>
+            <IconButton><EditIcon /></IconButton>
+          </Link>
+          <Divider orientation="vertical" flexItem />
+          <IconButton onClick={() => handleDelete(params.getValue('id'))}><DeleteIcon /></IconButton>
+        </Box>
+      ),
+    },
+  ];
 
-            {/*<ConfirmDialog*/}
-            {/*    title="Delete Post?"*/}
-            {/*    open={openConfirm}*/}
-            {/*    setOpen={setOpenConfirm}*/}
-            {/*    onConfirm={handleDelete(params.getValue('id'))}*/}
-            {/*/>*/}
-          </Box>
-        )
-      }
-    }
-  ]
-
-  const rows = events.map((event, index) => {
-    return {
+  const rows = events.map((event, index) => (
+    {
       id: event._id,
       name: event.title,
       type: event.type,
       date: event.date,
       attendanceAvg: event.averageAttendance,
       capacityAvg: event.averageCapacity,
-      hasRecords: event.hasAttendanceRecords
+      hasRecords: event.hasAttendanceRecords,
     }
-  })
+  ));
 
   return (
     <Container maxWidth="lg" className={classes.container}>
@@ -316,6 +318,14 @@ export default function EventList(props) {
           </Grid>
         </Grid>
       </Grid>
+      <ConfirmDialog
+        title="Delete this event?"
+        open={openConfirm}
+        setOpen={setOpenConfirm}
+        onConfirm={doDelete}
+      >
+        Are you sure you want to delete this event? This action is permanent, and cannot be undone.
+      </ConfirmDialog>
     </Container>
   );
 }
