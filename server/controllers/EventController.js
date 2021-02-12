@@ -1,24 +1,21 @@
 const { deleteAttendanceFromDb } = require("../models/mongodb/MongoRepository");
 const { deleteEventFromDb } = require("../models/mongodb/MongoRepository");
 const {
-  deleteAllEventsFromDb, saveEventToDb, getEventsFromDb,
+  deleteAllEventsFromDb, saveEventToDb, getEventsFromDb, getEventFromDb,
   deleteAllAttendanceFromDb
 } = require("../models/mongodb/MongoRepository");
 
 const getEvents = async (req, res, next) => {
-  let events
-  if (req.query.eventId) {
-    events = await getEventsFromDb(req.query.eventId)
-  } else {
-    events = await getEventsFromDb()
-  }
-
+  const events = req.query.eventId ? await getEventFromDb(req.query.eventId) : await getEventsFromDb()
   return res.json(events)
 }
-/*
-* Returns an array of JSON objects of a given length (10 if undefined), filled firs by all events that still need submitting, with the rest
-* of the array being filled with the most recent events ordered by date.
-* */
+
+/**
+ * Returns an array of JSON objects of a given length, filled first by all events that still need submitting, with the
+ * rest being filled with the most recent events ordered by ascending date.
+ *
+ * @param {Integer} [req.query.listLength] - Size of the number of events to return (default 10).
+ */
 const getEventDashboardList = async (req, res, next) => {
   // Check if an array length number has been defined and store that value, otherwise default the value to 10
   let listLength = req.query.listLength ? req.query.listLength : 10
@@ -54,19 +51,6 @@ const getEventDashboardList = async (req, res, next) => {
   res.json(sortedEvents)
 }
 
-const getRecentEvents = async (req, res, next) => {
-  let events = await getEventsFromDb()
-  let numberToSplice = (req.query.number) ? (req.query.number) : 5
-
-  let sortedEvents = events.sort((a, b) => {
-    const dateA = new Date(a.date)
-    const dateB = new Date(b.date)
-    return (dateA > dateB) ? -1 : 1
-  })
-
-  res.json(sortedEvents)
-}
-
 const saveEvent = async (req, res, next) => {
   let eventObject = req.body
   eventObject.date = new Date(eventObject.date)
@@ -78,13 +62,13 @@ const saveEvent = async (req, res, next) => {
 const deleteEvent = async (req, res, next) => {
   let eventId = req.query.eventId
 
-  if (eventId === undefined) {
-    res.status(404).send("No event Id specified! No records deleted")
-  } else {
+  if (eventId) {
     const deleteResult = await deleteEventFromDb(eventId)
     const deleteAttendanceResult = await deleteAttendanceFromDb(eventId)
 
     res.status(200).send(`Delete successful: ${deleteResult.result.n} event(s) and ${deleteAttendanceResult.result.n} attendance record(s) were wiped.`)
+  } else {
+    res.status(404).send("No event Id specified! No records deleted")
   }
 }
 
@@ -97,5 +81,5 @@ const resetEvents = async (req, res, next) => {
 
 
 module.exports = {
-  getEvents, getRecentEvents, saveEvent, deleteEvent, resetEvents, getEventDashboardList
+  getEvents, saveEvent, deleteEvent, resetEvents, getEventDashboardList
 }

@@ -1,42 +1,37 @@
 const {
-  getMembersFromDb, saveMemberToDb,
-  deleteMemberFromDb, deleteAllMembersFromDb,
-  deleteAttendanceFromDb, deleteAllAttendanceFromDb
+  getMembersFromDb,
+  getMemberFromDb,
+  saveMemberToDb,
+  deleteMemberFromDb,
+  deleteAllMembersFromDb,
+  deleteAttendanceFromDb,
+  deleteAllAttendanceFromDb
 } = require("../models/mongodb/MongoRepository");
+
+const { Member } = require('../models/Member')
 
 
 const getMembers = async (req, res, next) => {
-  if (req.query.memberId !== undefined) {
-    res.json(await getMembersFromDb(req.query.memberId))
-  } else {
-    res.json(await getMembersFromDb())
-  }
+  const members = req.query.memberId ? (await getMemberFromDb(req.query.memberId)).toDto()
+    : (await getMembersFromDb()).map((member) => (member.toDto()))
+  res.json(members)
 }
 
 const saveMember = async (req, res, next) => {
-  let memberObject = req.body
-
-  memberObject.startDate = new Date(memberObject.startDate)
-
-  if (memberObject.endDate !== undefined) {
-    memberObject.endDate = new Date(memberObject.endDate)
-  }
-
-  await saveMemberToDb(memberObject)
-
+  await saveMemberToDb(Member.fromDto(req.body))
   res.sendStatus(200)
 }
 
 const deleteMember = async (req, res, next) => {
   let memberId = req.query.memberId
 
-  if (memberId === undefined) {
-    res.status(404).send("No member Id specified! No records deleted").end()
-  } else {
+  if (memberId) {
     const deleteResult = await deleteMemberFromDb(memberId)
     const deleteAttendanceResult = await deleteAttendanceFromDb(null, memberId)
 
     res.status(200).send(`Delete successful: ${deleteResult.result.n} member(s) and ${deleteAttendanceResult.result.n} attendance record(s) were wiped.`)
+  } else {
+    res.status(404).send("No member Id specified! No records deleted").end()
   }
 }
 
