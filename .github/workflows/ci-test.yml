@@ -22,7 +22,7 @@ jobs:
         run: cd client && npm install
 
       - name: Run ESLint
-        run: npm run
+        run: npm run lint
 
   front-end:
     name: Build react client
