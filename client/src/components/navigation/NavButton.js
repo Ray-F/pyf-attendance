@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { IconButton, makeStyles } from "@material-ui/core";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack"
 import HomeIcon from '@material-ui/icons/Home';
@@ -24,10 +24,16 @@ function NavButton(props) {
   const classes = useStyles()
   const history = useHistory()
 
+  const handleBackButton = () => {
+    if (history.location.pathname !== "/") {
+      history.goBack()
+    }
+  }
+
   switch (props.navType) {
     case "back":
       return (
-        <IconButton label={'Back'} onClick={() => history.goBack()} className={classes.backButton}>
+        <IconButton label={'Back'} onClick={handleBackButton} className={classes.backButton}>
           <ArrowBackIcon />
         </IconButton>
       )
