@@ -7,12 +7,13 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
 
+// eslint-disable-next-line react/jsx-props-no-spreading
+const Transition = React.forwardRef((props, ref) => (<Slide direction="up" ref={ref} {...props} />));
+
 function ConfirmDialog(props) {
   const {
     title, children, open, setOpen, onConfirm,
   } = props;
-
-  // const Transition = React.forwardRef((props, ref) => <Slide direction="up" ref={ref} {...props} />);
 
   return (
     <Dialog
@@ -20,6 +21,7 @@ function ConfirmDialog(props) {
       onClose={() => setOpen(false)}
       aria-labelledby="alert-dialog-slide-title"
       aria-describedby="alert-dialog-slide-description"
+      TransitionComponent={Transition}
     >
       <DialogTitle id="alert-dialog-slide-title">{title}</DialogTitle>
       <DialogContent><DialogContentText id="alert-dialog-slide-description">{children}</DialogContentText></DialogContent>
@@ -27,7 +29,7 @@ function ConfirmDialog(props) {
         <Button
           variant="contained"
           onClick={() => setOpen(false)}
-          color="deafult"
+          color="secondary"
         >
           No
         </Button>
@@ -37,7 +39,7 @@ function ConfirmDialog(props) {
             setOpen(false);
             onConfirm();
           }}
-          color="secondary"
+          color="default"
         >
           Yes
         </Button>
