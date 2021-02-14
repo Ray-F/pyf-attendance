@@ -49,6 +49,17 @@ const deploy = async (req, res, next) => {
   }
 }
 
+/**
+ * Resets the development database to have the same information as production database.
+ */
+const resetDevelopmentDatabase = async (req, res, next) => {
+  // Execute script file
+  shell.exec(`../scripts/reset-dev-db.sh "${config.DatabaseUri.PROD}" "${config.DatabaseUri.DEV}" "${Date.now()}"`);
+
+  res.status(200).send("200: Successfully reset development database to match production environment!");
+}
+
 module.exports = {
-  deploy
+  deploy,
+  resetDevelopmentDatabase,
 }
