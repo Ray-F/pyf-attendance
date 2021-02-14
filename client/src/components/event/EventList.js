@@ -9,12 +9,14 @@ import {
 
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
+
 import { Redirect } from 'react-router';
 import { Link } from 'react-router-dom';
 import CapacityByEventTypeOverTime from './graphs/CapacityByEventTypeOverTime';
 import { getAttendanceColour, getCapacityColour } from '../../utils/CapacityUtils';
 import AttendanceByEventTypeOverTime from './graphs/AttendanceByEventTypeOverTime';
 import DisplayPaper from '../DisplayPaper';
+import ConfirmDialog from '../ConfirmDialog';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -78,12 +80,19 @@ export default function EventList(props) {
   const classes = useStyles();
   const [events, setEvents] = useState([]);
   const [refresh, setRefresh] = useState(0);
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [deleteId, setDeleteId] = useState('');
 
   const handleDelete = (eventId) => {
-    fetch(`/api/events/delete?eventId=${eventId}`, { method: 'GET' }).then(async (promise) => {
-      const res = await promise;
+    setOpenConfirm(true);
+    setDeleteId(eventId);
+  };
 
+  const doDelete = () => {
+    fetch(`/api/events/delete?eventId=${deleteId}`, { method: 'GET' }).then(async (promise) => {
+      const res = await promise;
       setRefresh(refresh + 1);
+      setDeleteId();
     });
   };
 
@@ -94,7 +103,7 @@ export default function EventList(props) {
       fetch('/api/attendance/all', { method: 'GET' }).then(async (promise) => {
         const data = await promise.json();
 
-        if (eventsData === undefined) {
+        if (!eventsData) {
           await eventsData;
         }
 
@@ -110,7 +119,7 @@ export default function EventList(props) {
           if (nShouldAttend === 0) return event;
 
           let totalCapacity = 0;
-          const inAttendance = attendanceForEvent.filter((attendance) => attendance.isAbsent !== true);
+          const inAttendance = attendanceForEvent.filter((attendance) => !attendance.isAbsent);
           inAttendance.forEach((attendance) => {
             if (event.type === 'Meeting') {
               totalCapacity += attendance.capacity;
@@ -138,19 +147,23 @@ export default function EventList(props) {
     });
   }, [refresh]);
 
-  const meetingAttendanceXY = events.filter((event) => (event.type === 'Meeting' && event.averageAttendance !== undefined))
+  const meetingAttendanceXY = events.filter(
+    (event) => (event.type === 'Meeting' && event.averageAttendance),
+  )
     .map((event) => ({
       x: new Date(event.date),
       y: event.averageAttendance,
     }));
 
-  const eventAttendanceXY = events.filter((event) => ((event.type === 'Project' || event.type === 'Training') && event.averageAttendance !== undefined))
+  const eventAttendanceXY = events.filter(
+    (event) => ((event.type === 'Project' || event.type === 'Training') && event.averageAttendance),
+  )
     .map((event) => ({
       x: new Date(event.date),
       y: event.averageAttendance,
     }));
 
-  const meetingCapacityXY = events.filter((event) => event.type === 'Meeting' && event.averageCapacity !== undefined)
+  const meetingCapacityXY = events.filter((event) => event.type === 'Meeting' && event.averageCapacity)
     .map((event) => ({
       x0: new Date(event.date) - 1000 * 60 * 60 * 24 * 6,
       x: new Date(event.date),
@@ -246,15 +259,17 @@ export default function EventList(props) {
     },
   ];
 
-  const rows = events.map((event, index) => ({
-    id: event._id,
-    name: event.title,
-    type: event.type,
-    date: event.date,
-    attendanceAvg: event.averageAttendance,
-    capacityAvg: event.averageCapacity,
-    hasRecords: event.hasAttendanceRecords,
-  }));
+  const rows = events.map((event, index) => (
+    {
+      id: event._id,
+      name: event.title,
+      type: event.type,
+      date: event.date,
+      attendanceAvg: event.averageAttendance,
+      capacityAvg: event.averageCapacity,
+      hasRecords: event.hasAttendanceRecords,
+    }
+  ));
 
   return (
     <Container maxWidth="lg" className={classes.container}>
@@ -303,6 +318,14 @@ export default function EventList(props) {
           </Grid>
         </Grid>
       </Grid>
+      <ConfirmDialog
+        title="Delete this event?"
+        open={openConfirm}
+        setOpen={setOpenConfirm}
+        onConfirm={doDelete}
+      >
+        Are you sure you want to delete this event? This action is permanent, and cannot be undone.
+      </ConfirmDialog>
     </Container>
   );
 }
