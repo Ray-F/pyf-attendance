@@ -34,36 +34,33 @@ const getAttendance = async (req, res, next) => {
 
 /**
  * Only call this function if an event has not been submitted against before.
+ *
+ * @param {Event} event - The Event we are generating new attendance records for.
  */
-const generateNewAttendanceRecords = async (eventObject) => {
+const generateNewAttendanceRecords = async (event) => {
   const members = await getMembersFromDb()
 
   return members.filter(member => {
-    const eventDate = new Date(eventObject.date)
+    const eventDate = event.date
 
     if (member.endDate) {
       return (eventDate >= member.startDate && eventDate <= member.endDate)
     } else {
       return (eventDate >= member.startDate)
     }
-  }).map((member) => {
-    const attendance = Attendance.fromDto(
+  }).map((member) => new Attendance(
       {
-        _id: undefined,
         memberId: member.id,
         fullName: member.fullName,
-        eventId: eventObject._id,
-        eventType: eventObject.type,
-        isShort: false,
+        eventId: event.id,
+        eventType: event.type,
+        isLate: false,
         isAbsent: false,
         isExcused: false,
         excuseReason: '',
         capacity: 1
       }
-    )
-
-    return attendance.toDto()
-  })
+    ).toDto())
 }
 
 const resetAttendance = async (req, res, next) => {
@@ -77,7 +74,20 @@ const resetAttendance = async (req, res, next) => {
  * Called when user submits an attendance sheet.
  */
 const saveAttendance = async (req, res, next) => {
-  const records = req.body.map(record => Attendance.fromDto(record))
+  const records = req.body.map(record => new Attendance(
+    {
+      eventId: record.eventId,
+      eventType: record.eventType,
+      excuseReason: record.excuseReason,
+      fullName: record.fullName,
+      id: record.id,
+      isAbsent: record.isAbsent,
+      isExcused: record.isExcused,
+      isLate: record.isShort,
+      memberId: record.memberId,
+      capacity: record.capacity
+    }
+  ))
   const eventId = req.body[0].eventId
   const eventObject = await getEventFromDb(eventId)
 

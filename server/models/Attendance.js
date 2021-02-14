@@ -3,57 +3,70 @@ const ObjectId = require('mongodb').ObjectId
 
 class Attendance {
   /**
-   * @type string
+   * @type {string}
    */
   id;
 
   /**
-   * @type string
+   * @type {string}
    */
   memberId;
 
   /**
-   * @type String
+   * @type {string}
    */
   fullName;
 
   /**
-   * @type boolean
+   * @type {boolean}
    */
   isLate;
 
   /**
-   * @type boolean
+   * @type {boolean}
    */
   isAbsent;
 
   /**
-   * @type boolean
+   * @type {boolean}
    */
   isExcused;
 
   /**
-   * @type string
+   * @type {string}
    */
   excuseReason;
 
   /**
-   * @type {Integer | null}
+   * @type {Integer|null}
    */
   capacity;
 
   /**
-   * @type string
+   * @type {string}
    */
   eventId;
 
   /**
-   * @type EventType
+   * @type {string}
    */
   eventType;
 
-  constructor(id, memberId, fullName, eventId, eventType, isLate, isAbsent, isExcused, excuseReason, capacity) {
-    this.id = id
+  /**
+   * @param {Object} obj - An attendance object.
+   * @param {string} [obj.id] - The ID of the attendance object.
+   * @param {string} obj.memberId - The ID of the member who this attendance belongs to.
+   * @param {string} obj.fullName - The full name of the member who this attendance belongs to.
+   * @param {string} obj.eventId - The ID of the event who this attendance is for.
+   * @param {string} obj.eventType - The type of event this attendance is for.
+   * @param {boolean} obj.isLate - If member was late to arrive or early to leave.
+   * @param {boolean} obj.isAbsent - If member was absent.
+   * @param {boolean} obj.isExcused - If member was excused.
+   * @param {string} obj.excuseReason - The excuse reason if they were excused.
+   * @param {Integer} obj.capacity - The capacity of the member if applicable.
+   */
+  constructor({id, memberId, fullName, eventId, eventType, isLate, isAbsent, isExcused, excuseReason, capacity}) {
+    this.id = id || new ObjectId().toString()
     this.isLate = isLate;
     this.isAbsent = isAbsent;
     this.isExcused = isExcused;
@@ -73,21 +86,11 @@ class Attendance {
     }
   }
 
-  static fromDto({ _id, memberId, fullName, eventId, eventType, isLate, isAbsent, isExcused, excuseReason, capacity }) {
-    return new Attendance(
-      _id ? _id.toString() : undefined,
-      memberId.toString(),
-      fullName,
-      eventId.toString(),
-      eventType,
-      (isLate === "true" || isLate === true),
-      (isAbsent === "true" || isAbsent === true),
-      (isExcused === "true" || isExcused === true),
-      excuseReason,
-      parseInt(capacity)
-    )
-  }
-
+  /**
+   * Returns the object in DTO format to be sent for client side rendering.
+   *
+   * @returns {Object}
+   */
   toDto() {
     return {
       id: this.id,
@@ -103,21 +106,11 @@ class Attendance {
     }
   }
 
-  static fromDbo(dboObject) {
-    return new Attendance(
-      dboObject._id.toString(),
-      dboObject.member.memberId.toString(),
-      dboObject.member.fullName,
-      dboObject.event.eventId.toString(),
-      dboObject.event.type,
-      (dboObject.isLate === "true" || dboObject.isLate === true),
-      (dboObject.isAbsent === "true" || dboObject.isAbsent === true),
-      (dboObject.isExcused === "true" || dboObject.isExcused === true),
-      dboObject.excuseReason,
-      dboObject.capacity
-    )
-  }
-
+  /**
+   * Returns the object in DBO format to be sent for database storing.
+   *
+   * @returns {Object}
+   */
   toDbo() {
     return {
       _id: this.id ? ObjectId(this.id) : undefined,
@@ -139,6 +132,7 @@ class Attendance {
     }
   }
 }
+
 
 module.exports = {
   Attendance

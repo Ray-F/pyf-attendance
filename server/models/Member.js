@@ -1,96 +1,72 @@
 const ObjectId = require('mongodb').ObjectId
 
+
 class Member {
 
   /**
-   * @type string | null
+   * @type {string|null}
    */
   id;
 
   /**
-   * @type string
+   * @type {string}
    */
   fullName;
 
   /**
-   * @type Date
+   * @type {Date}
    */
   startDate;
 
   /**
-   * @type Date | null
+   * @type {Date|null}
    */
   endDate;
 
   /**
-   * @param {string} [id] - The ID of the member.
-   * @param {string} fullName - The full name of the member.
-   * @param {Date} startDate - The starting date of the member.
-   * @param {Date} [endDate] - the leaving date of the member.
+   * @param {Object} obj - A member object.
+   * @param {string} [obj.id] - The ID of the member.
+   * @param {string} obj.fullName - The full name of the member.
+   * @param {Date|string} obj.startDate - The starting date of the member.
+   * @param {Date|string} [obj.endDate] - the leaving date of the member.
    */
-  constructor(id, fullName, startDate, endDate = null) {
-    this.id = id;
+  constructor({id, _id, fullName, startDate, endDate}) {
+    this.id = id || _id || null;
+    if (this.id) {
+      this.id = this.id.toString();
+    }
+
     this.fullName = fullName;
-    this.startDate = startDate;
-    this.endDate = endDate;
+    this.startDate = new Date(startDate);
+    this.endDate = endDate ? new Date(endDate) : null;
   }
 
   /**
-   * Converts a DBO (from the Database) to a `Member` object.
+   * Returns the object in DTO format to be sent for client-side rendering.
    *
-   * @param {string} _id
-   * @param {string} fullName
-   * @param {Date} startDate
-   * @param {Date} endDate
-   * @return {Member}
+   * @returns {Object}
    */
-  static fromDbo({_id, fullName, startDate, endDate}) {
-    return new Member(
-      _id.toString(),
-      fullName,
-      new Date(startDate),
-      endDate ? (new Date(endDate)) : null
-    )
-  }
-
-  /**
-   * Converts a DTO (from the client) to a `Member` object.
-   */
-  static fromDto({_id, fullName, startDate, endDate}) {
-    return new Member(
-      _id ? _id : null,
-      fullName,
-      new Date(startDate),
-      endDate ? (new Date(endDate)) : null
-    )
-  }
-
   toDto() {
-    let returnDto = {
+    return {
       _id: this.id,
       fullName: this.fullName,
       startDate: this.startDate,
+      endDate: this.endDate || undefined
     }
-
-    if (this.endDate) {
-      returnDto.endDate = this.endDate
-    }
-
-    return returnDto
   }
 
+  /**
+   * Returns the object in DBO format to be sent for database storing.
+   *
+   * @returns {Object}
+   */
   toDbo() {
-    let returnDbo = {
+    return {
       _id: this.id ? ObjectId(this.id) : undefined,
       fullName: this.fullName,
       startDate: this.startDate,
+      endDate: this.endDate || undefined
     }
-
-    if (this.endDate) {
-      returnDbo.endDate = this.endDate
-    }
-
-    return returnDbo
   }
 }
 

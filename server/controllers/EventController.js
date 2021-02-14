@@ -5,9 +5,12 @@ const {
   deleteAllAttendanceFromDb
 } = require("../models/mongodb/MongoRepository");
 
+const { Event } = require("../models/Event");
+
 const getEvents = async (req, res, next) => {
-  const events = req.query.eventId ? await getEventFromDb(req.query.eventId) : await getEventsFromDb()
-  return res.json(events)
+  const events = req.query.eventId
+    ? (await getEventFromDb(req.query.eventId)).toDto() : (await getEventsFromDb()).map((event) => event.toDto());
+  return res.json(events);
 }
 
 /**
@@ -27,35 +30,35 @@ const getEventDashboardList = async (req, res, next) => {
   // We sort these by date is so that when taking the first 10 events, these are the most recent events
   let noRecordEvents = allEvents
     .filter(event => !event.hasAttendanceRecords)
-    .sort((a, b) => new Date(a.date) > new Date(b.date) ? -1 : 1)
+    .sort((a, b) => a.date > b.date ? -1 : 1)
 
   // Find and store all events that have attendance records and sort these by date
   let recordEvents = allEvents
     .filter(event => event.hasAttendanceRecords)
-    .sort((a, b) => new Date(a.date) > new Date(b.date) ? -1 : 1)
+    .sort((a, b) => a.date > b.date ? -1 : 1)
 
   let combinedEvents = [...noRecordEvents, ...recordEvents].slice(0, listLength)
 
   if (req.query.eventId) {
     // Check if the requested eventId exists inside the current list of events, and if not, add the event
-    const doesExist = combinedEvents.some(event => event._id.toString() === req.query.eventId)
+    const doesExist = combinedEvents.some(event => event.id === req.query.eventId)
     if (!doesExist) {
-      let currentEvent = allEvents.find(event => event._id.toString() === req.query.eventId)
+      let currentEvent = allEvents.find(event => event.id === req.query.eventId)
       if (currentEvent) {
         combinedEvents.push(currentEvent)
       }
     }
   }
 
-  const sortedEvents = combinedEvents.sort((a, b) => new Date(a.date) > new Date(b.date) ? -1 : 1)
+  const sortedEvents = combinedEvents
+    .sort((a, b) => a.date > b.date ? -1 : 1)
+    .map((event) => event.toDto())
   res.json(sortedEvents)
 }
 
 const saveEvent = async (req, res, next) => {
-  let eventObject = req.body
-  eventObject.date = new Date(eventObject.date)
-
-  await saveEventToDb(eventObject)
+  console.log(req.body)
+  await saveEventToDb(new Event(req.body))
   res.sendStatus(200)
 }
 

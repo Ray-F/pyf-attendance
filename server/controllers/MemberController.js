@@ -13,12 +13,12 @@ const { Member } = require('../models/Member')
 
 const getMembers = async (req, res, next) => {
   const members = req.query.memberId ? (await getMemberFromDb(req.query.memberId)).toDto()
-    : (await getMembersFromDb()).map((member) => (member.toDto()))
+    : (await getMembersFromDb()).map((member) => (member.toDto()));
   res.json(members)
 }
 
 const saveMember = async (req, res, next) => {
-  await saveMemberToDb(Member.fromDto(req.body))
+  await saveMemberToDb(new Member(req.body));
   res.sendStatus(200)
 }
 

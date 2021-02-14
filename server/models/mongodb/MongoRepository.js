@@ -3,60 +3,67 @@ const ObjectId = require('mongodb').ObjectId
 const config = require('../../utils/Config')
 const { Attendance } = require('../Attendance')
 const { Member } = require('../Member')
+const { Event } = require('../Event')
 
 
 /**
  * Returns the collection instance for `collectionName`.
  *
- * @param {string} collectionName - The name of the collection to return.
- * @return {Collection}
+ * @param {string} collection - The name of the collection to return.
+ * @returns {Collection}
  */
-const getCollection = (collectionName) => {
-  switch (collectionName) {
+const getCollection = (collection) => {
+  switch (collection) {
     case "members":
     case "events":
     case "attendance":
-      return mongoClient.db(config.DB_NAME).collection(collectionName)
+      return mongoClient.db(config.DB_NAME).collection(collection)
     default:
-      throw new Error(`No collection "${collectionName}" found on "${config.DB_NAME}"`)
+      throw new Error(`No collection "${collection}" found on "${config.DB_NAME}"`)
   }
 }
 
 /**
  * Get members from the member collection.
  *
- * @return {Promise<Member[]>}
+ * @returns {Promise<Member[]>}
  */
 const getMembersFromDb = async () => {
   return (await getCollection("members").find({}).toArray())
-    .map((member) => Member.fromDbo(member))
+    .map((member) => new Member(
+      {
+        id: member._id,
+        fullName: member.fullName,
+        startDate: member.startDate,
+        endDate: member.endDate
+      }))
 }
 
 /**
  * Gets a single member with `memberId` from the members collection.
  *
  * @param {string} memberId - The ID of the member object to return.
- * @return {Promise<Member>}
+ * @returns {Promise<Member>}
  */
 const getMemberFromDb = async (memberId) => {
-  return Member.fromDbo(await getCollection("members").findOne({ "_id": ObjectId(memberId)}));
+  const mongoMember = await getCollection("members").findOne({ "_id": ObjectId(memberId)})
+  return new Member(mongoMember);
 }
 
 /**
  * Saves a `memberObject` to the members collection.
  *
- * If `memberObject._id` exists, this will edit the member instead of creating a new one.
+ * If `member.id` exists, this will edit the member instead of creating a new one.
  *
  * @param {Member} member - The member object to save to the members collection.
- * @return {Promise<*>}
+ * @returns {Promise<*>}
  */
 const saveMemberToDb = async (member) => {
   // If an member ID was passed to this function, then update existing record
   if (member.id) {
-    member.id = ObjectId(member.id)
-
-    const query = { _id: member.id }
-    const update = { $set: member.toDbo() }
+    const mongoMember = member.toDbo();
+    const query = { _id: mongoMember._id }
+    const update = { $set: mongoMember }
     const options = { upsert: false }
 
     return await getCollection("members").updateOne(query, update, options)
@@ -69,7 +76,7 @@ const saveMemberToDb = async (member) => {
  * Deletes a member with `memberId` from the members collection.
  *
  * @param {string} memberId - The ID of the member to delete.
- * @return {Promise<*>}
+ * @returns {Promise<*>}
  */
 const deleteMemberFromDb = async (memberId) => {
   const query = {
@@ -84,7 +91,7 @@ const deleteMemberFromDb = async (memberId) => {
 /**
  * Deletes all members from the members collection.
  *
- * @return {Promise<*>}
+ * @returns {Promise<*>}
  */
 const deleteAllMembersFromDb = async () => {
   return await getCollection("members").deleteMany({})
@@ -93,43 +100,48 @@ const deleteAllMembersFromDb = async () => {
 /**
  * Gets all events from the events collection.
  *
- * @return {Promise<Object[]>}
+ * @returns {Promise<Event[]>}
  */
 const getEventsFromDb = async () => {
-  return await getCollection("events").find({}).toArray()
+  return (await getCollection("events").find({}).toArray())
+    .map((event) => new Event(event))
 }
 
 /**
  * Gets a single event with `eventId` from the events collection.
  *
  * @param {string} eventId - The ID of the event to return.
- * @return {Promise<Object>}
+ * @returns {Promise<Event>}
  */
 const getEventFromDb = async (eventId) => {
-  return await getCollection("events").findOne({ "_id": ObjectId(eventId) });
+  const mongoEvent = await getCollection("events").findOne({ "_id": ObjectId(eventId) });
+  return (new Event(mongoEvent))
 }
 
 /**
  * Saves an event to the events collection.
  *
- * @param {Object} eventObject - The event object to save.
- * @return {Promise<*>}
+ * @param {Event} event - The event to save.
+ * @returns {Promise<*>}
  */
-const saveEventToDb = async (eventObject) => {
-  eventObject._id = ObjectId(eventObject._id)
+const saveEventToDb = async (event) => {
+  if (event.id) {
+    const mongoEvent = event.toDbo()
+    const query = { _id : mongoEvent._id }
+    const update = { $set: mongoEvent }
+    const options = { upsert: true }
 
-  const query = { _id : eventObject._id }
-  const update = { $set: eventObject }
-  const options = { upsert: true }
-
-  return await getCollection("events").updateOne(query, update, options)
+    return await getCollection("events").updateOne(query, update, options)
+  } else {
+    return await getCollection("events").insertOne(event.toDbo())
+  }
 }
 
 /**
  * Deletes an event with `eventId` from the events collection.
  *
  * @param {string} eventId - The ID of the event to delete.
- * @return {Promise<*>}
+ * @returns {Promise<*>}
  */
 const deleteEventFromDb = async (eventId) => {
   const query = {
@@ -144,7 +156,7 @@ const deleteEventFromDb = async (eventId) => {
 /**
  * Deletes all events from the events collection.
  *
- * @return {Promise<*>}
+ * @returns {Promise<*>}
  */
 const deleteAllEventsFromDb = async () => {
   return await getCollection("events").deleteMany({})
@@ -153,9 +165,9 @@ const deleteAllEventsFromDb = async () => {
 /**
  * Updates an event(s) to have the `event.hasAttendanceRecords` field set to `recorded` value.
  *
- * @param {string | null} [eventId] - The ID of the event to change attendance records for.
- * @param {Boolean} [recorded] - Sets the status of the recorded field.
- * @return {Promise<*>}
+ * @param {string|null} [eventId] - The ID of the event to change attendance records for.
+ * @param {boolean} [recorded] - Sets the status of the recorded field.
+ * @returns {Promise<*>}
  */
 const setEventRecorded = async (eventId = null, recorded = true) => {
   const query = {
@@ -173,9 +185,9 @@ const setEventRecorded = async (eventId = null, recorded = true) => {
 /**
  * Gets attendance records from the attendance collection.
  *
- * @param {string | null} [eventId] - The ID of the event to return attendance records for.
- * @param {string | null} [memberId] - The ID of the member to return attendance records for.
- * @return {Promise<Attendance[]>}
+ * @param {string|null} [eventId] - The ID of the event to return attendance records for.
+ * @param {string|null} [memberId] - The ID of the member to return attendance records for.
+ * @returns {Promise<Attendance[]>}
  */
 const getAttendanceFromDb = async (eventId = null, memberId = null) => {
   let attendanceDboObjects
@@ -193,14 +205,27 @@ const getAttendanceFromDb = async (eventId = null, memberId = null) => {
     attendanceDboObjects = await getCollection("attendance").find({}).sort({'_id' : -1}).toArray()
   }
 
-  return attendanceDboObjects.map((dboObject) => Attendance.fromDbo(dboObject))
+  return attendanceDboObjects.map((dboObject) => new Attendance(
+    {
+      id: dboObject._id.toString(),
+      memberId: dboObject.member.memberId.toString(),
+      fullName: dboObject.member.fullName,
+      eventId: dboObject.event.eventId.toString(),
+      eventType: dboObject.event.type,
+      isLate: (dboObject.isLate === "true" || dboObject.isLate === true),
+      isAbsent: (dboObject.isAbsent === "true" || dboObject.isAbsent === true),
+      isExcused: (dboObject.isExcused === "true" || dboObject.isExcused === true),
+      excuseReason: dboObject.excuseReason,
+      capacity: dboObject.capacity
+    }
+  ))
 }
 
 /**
  * Saves attendance records to attendance collection.
  *
  * @param {Attendance[]} attendanceArray - Array of attendance objects to save.
- * @return {Promise<*>}
+ * @returns {Promise<*>}
  */
 const saveAttendanceToDb = async (attendanceArray) => {
   const attendanceDboObjects = attendanceArray.map((attendance) => attendance.toDbo())
@@ -210,7 +235,7 @@ const saveAttendanceToDb = async (attendanceArray) => {
 /**
  * Deletes attendance records for an event or member from the attendance collection.
  *
- * @return {Promise<*>}
+ * @returns {Promise<*>}
  */
 const deleteAttendanceFromDb = async (eventId = null, memberId = null) => {
   let query
@@ -237,11 +262,12 @@ const deleteAttendanceFromDb = async (eventId = null, memberId = null) => {
 /**
  * Deletes all attendance records from the attendance collection.
  *
- * @return {Promise<*>}
+ * @returns {Promise<*>}
  */
 const deleteAllAttendanceFromDb = async () => {
   return await getCollection("attendance").deleteMany({})
 }
+
 
 module.exports = {
   getEventsFromDb,
