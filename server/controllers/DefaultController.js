@@ -53,10 +53,19 @@ const deploy = async (req, res, next) => {
  * Resets the development database to have the same information as production database.
  */
 const resetDevelopmentDatabase = async (req, res, next) => {
-  // Execute script file
-  shell.exec(`../scripts/reset-dev-db.sh "${config.DatabaseUri.PROD}" "${config.DatabaseUri.DEV}" "${Date.now()}"`);
+  // Script arguments
+  const PROD_URI = config.DatabaseUri.PROD
+  const DEV_URI = config.DatabaseUri.DEV
+  const currentDate = Date.now()
 
-  res.status(200).send("200: Successfully reset development database to match production environment!");
+  // Execute script file
+  const shellResp = shell.exec(`../scripts/reset-dev-db.sh "${PROD_URI}" "${DEV_URI}" "${currentDate}"`)
+
+  if (shellResp.code === 0) {
+    res.status(200).send("200: Successfully reset development database to match production environment!");
+  } else {
+    res.status(500).send(`500: Error when executing shell script. Exit code ${shellResp.code}`);
+  }
 }
 
 module.exports = {
