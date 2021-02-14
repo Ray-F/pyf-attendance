@@ -9,7 +9,7 @@
 ## How to use this repository
 
 ### Prerequisites
-- `node` (version 15+) is installed
+- `node` (version 14.15+) is installed
 - `yarn` is installed
 
 ### Steps to initialize project
