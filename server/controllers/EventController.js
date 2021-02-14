@@ -7,6 +7,12 @@ const {
 
 const { Event } = require("../models/Event");
 
+
+/**
+ * Gets all events or a single event if an `eventId` is passed.
+ *
+ * @param {string} [req.query.eventId] - The ID of the event to return.
+ */
 const getEvents = async (req, res, next) => {
   const events = req.query.eventId
     ? (await getEventFromDb(req.query.eventId)).toDto() : (await getEventsFromDb()).map((event) => event.toDto());
@@ -17,7 +23,7 @@ const getEvents = async (req, res, next) => {
  * Returns an array of JSON objects of a given length, filled first by all events that still need submitting, with the
  * rest being filled with the most recent events ordered by ascending date.
  *
- * @param {Integer} [req.query.listLength] - Size of the number of events to return (default 10).
+ * @param {number} [req.query.listLength] - Size of the number of events to return (default 10).
  */
 const getEventDashboardList = async (req, res, next) => {
   // Check if an array length number has been defined and store that value, otherwise default the value to 10
@@ -56,12 +62,25 @@ const getEventDashboardList = async (req, res, next) => {
   res.json(sortedEvents)
 }
 
+/**
+ * Saves an event.
+ *
+ * @param {string} [req.body._id] - The ID of the event to save (if applicable).
+ * @param {string} [req.body.title] - The title of the event.
+ * @param {string} req.body.type - The type of event.
+ * @param {string} req.body.date - The date of the event.
+ * @param {boolean} req.body.hasAttendanceRecords - If the event has existing attendance records.
+ */
 const saveEvent = async (req, res, next) => {
-  console.log(req.body)
   await saveEventToDb(new Event(req.body))
   res.sendStatus(200)
 }
 
+/**
+ * Deletes the specified event along with their associated attendance records.
+ *
+ * @param {string} req.query.eventId - The ID of the event to delete.
+ */
 const deleteEvent = async (req, res, next) => {
   let eventId = req.query.eventId
 
@@ -75,6 +94,9 @@ const deleteEvent = async (req, res, next) => {
   }
 }
 
+/**
+ * Deletes all events along with their associated attendance records.
+ */
 const resetEvents = async (req, res, next) => {
   const deleteResult = await deleteAllEventsFromDb()
   const deleteAttendanceResult = await deleteAllAttendanceFromDb()

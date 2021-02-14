@@ -2,9 +2,15 @@ const crypto = require('crypto')
 const config = require('../utils/Config')
 const shell = require('shelljs')
 
+
 /**
  * Automatically deploys the latest changes to the web server. This function will only return 200 success if run
  * on the web server, and when sent a request via Github Webhook.
+ *
+ * @param {Object} req.body - The Github payload.
+ * @param {string} req.body.head_commit - The latest commit to the repository on GitHub.
+ * @param {string} req.body.ref - Which branch the action was made inside.
+ * @param {*} req.get - Function to get the specified value from the request headers.
  */
 const deploy = async (req, res, next) => {
   const payload = JSON.stringify(req.body)
@@ -15,7 +21,6 @@ const deploy = async (req, res, next) => {
     return
   }
   
-  console.log(req.body.ref)
   if (req.body.ref !== "refs/heads/master") {
     res.status(409).send("Push was not to master")
     return
@@ -48,6 +53,7 @@ const deploy = async (req, res, next) => {
     res.status(403).send("Secrets do not match")
   }
 }
+
 
 module.exports = {
   deploy

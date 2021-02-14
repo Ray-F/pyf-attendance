@@ -63,7 +63,7 @@ class Attendance {
    * @param {boolean} obj.isAbsent - If member was absent.
    * @param {boolean} obj.isExcused - If member was excused.
    * @param {string} obj.excuseReason - The excuse reason if they were excused.
-   * @param {Integer} obj.capacity - The capacity of the member if applicable.
+   * @param {number} obj.capacity - The capacity of the member if applicable.
    */
   constructor({id, memberId, fullName, eventId, eventType, isLate, isAbsent, isExcused, excuseReason, capacity}) {
     this.id = id || new ObjectId().toString()
