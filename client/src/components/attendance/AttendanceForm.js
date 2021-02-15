@@ -230,7 +230,10 @@ export default function AttendanceForm(props) {
         setSubmitSuccessful(submitSuccessful + 1);
         setPromptMessage('Successfully submitted attendance form!');
 
-        setTimeout(() => setPromptMessage(''), 3000);
+        setTimeout(() => {
+          setPromptMessage('');
+          history.replace('/events');
+        }, 1500);
       }
     });
   };

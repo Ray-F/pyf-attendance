@@ -102,7 +102,10 @@ export default function EventForm(props) {
         } else {
           setSubmitSuccessful(1);
           setPromptMessage('Successfully edited an existing event!');
-          setTimeout(() => setPromptMessage(''), 3000);
+          setTimeout(() => {
+            setPromptMessage('');
+            history.replace('/events');
+          }, 1500);
         }
       });
     } else {
