@@ -9,7 +9,7 @@ set -e
 
 # Dump the current production database to a folder
 printf "\n[SERVER] Running dump...\n"
-mongodump --out="../db-dump-$CURRENT_DATE" --uri="$MONGODB_URI_PROD"
+mongodump --forceTableScan --out="../db-dump-$CURRENT_DATE" --uri="$MONGODB_URI_PROD"
 
 printf "\n[SERVER] Running restore...\n"
 # Restore the dumped folder to the development database
