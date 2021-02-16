@@ -3,6 +3,7 @@ import {
   Checkbox, FormControlLabel, Grid, makeStyles, TextField,
 } from '@material-ui/core';
 
+import { useHistory } from 'react-router-dom';
 import FormPaper from '../FormPaper';
 import { getDateFromDisplay, getDisplayDate } from '../../utils/DateTimeUtils';
 
@@ -23,6 +24,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function MemberForm(props) {
   const classes = useStyles();
+  const history = useHistory();
 
   const [isNew, setIsNew] = useState(props.memberId !== undefined);
 
@@ -88,11 +90,17 @@ export default function MemberForm(props) {
       } else if (isNew) {
         setSubmitSuccessful(1);
         setPromptMessage(`Successfully added new member: ${memberName}`);
-        setTimeout(() => setPromptMessage(''), 3000);
+        setTimeout(() => {
+          setPromptMessage('');
+          history.replace('/members');
+        }, 1500);
       } else {
         setSubmitSuccessful(1);
         setPromptMessage(`Successfully edited current member: ${memberName}`);
-        setTimeout(() => setPromptMessage(''), 3000);
+        setTimeout(() => {
+          setPromptMessage('');
+          history.replace('/members');
+        }, 1500);
       }
     });
   };
