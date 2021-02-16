@@ -3,7 +3,7 @@ const { Router } = require('express');
 const { saveEvent, getEvents, getRecentEvents, deleteEvent, resetEvents, getEventDashboardList } = require('../controllers/EventController')
 const { getMembers, saveMember, deleteMember, resetMembers } = require('../controllers/MemberController')
 const {
-  resetAttendance, getAllAttendanceRecords, saveAttendanceSheet, getAttendanceSheet, deleteAttendanceRecords
+  resetAttendance, getAttendance, saveAttendance, deleteAttendance
 } = require('../controllers/AttendanceController')
 
 const router = Router();
@@ -14,17 +14,16 @@ router.get('/members/delete', deleteMember)
 router.get('/members/reset', resetMembers)
 
 router.get('/events', getEvents)
-router.get('/events/recent', getRecentEvents)
 router.get('/events/list', getEventDashboardList)
 router.post('/events/add', saveEvent)
 router.get('/events/reset', resetEvents)
 router.get('/events/delete', deleteEvent)
 
-router.get('/attendance', getAttendanceSheet)
-router.get('/attendance/all', getAllAttendanceRecords)
-router.post('/attendance', saveAttendanceSheet)
+router.get('/attendance', getAttendance)
+router.get('/attendance/all', getAttendance)
+router.post('/attendance', saveAttendance)
 router.get('/attendance/reset', resetAttendance)
-router.get('/attendance/delete', deleteAttendanceRecords)
+router.get('/attendance/delete', deleteAttendance)
 
 router.get('*', (req, res) => {
   res.status(200).send(
