@@ -7,6 +7,7 @@ import MemberPage from './pages/MemberPage';
 import AttendancePage from './pages/AttendancePage';
 import HomePage from './pages/HomePage';
 import NavButton from '../components/navigation/NavButton';
+import DevelopmentPage from './pages/DevelopmentPage';
 
 const useStyles = makeStyles((theme) => ({
   navContainer: {
@@ -30,6 +31,7 @@ export default function MainRouter() {
           <Route exact path="/events/:operation?" component={EventPage} />
           <Route path="/members/:operation?" component={MemberPage} />
           <Route path="/attendance" component={AttendancePage} />
+          <Route path="/development" component={DevelopmentPage} />
           <Route path="" component={HomePage} />
         </Switch>
       </BrowserRouter>
