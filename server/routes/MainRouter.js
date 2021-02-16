@@ -4,7 +4,12 @@ const path = require('path')
 const defaultController = require('../controllers/DefaultController')
 
 const router = Router()
+
+// Route to deploy changes to production
 router.post('/deploy', defaultController.deploy);
+
+// Route to reset the development database
+router.get('/api/reset-db', defaultController.resetDevelopmentDatabase);
 
 // To add another router:
 // const inputRouter = require('./anotherRouter');
