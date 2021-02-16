@@ -24,6 +24,7 @@ const CI_BUILD = process.env.CI === "true" || process.env.CI === "1"
 
 
 module.exports = {
+  DatabaseUri,
   ENV,
   DB_URI,
   DB_NAME,
