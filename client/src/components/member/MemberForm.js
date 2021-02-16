@@ -24,6 +24,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function MemberForm(props) {
   const classes = useStyles();
+  const history = useHistory();
 
   const [isNew, setIsNew] = useState(props.memberId !== undefined);
 
@@ -36,8 +37,6 @@ export default function MemberForm(props) {
 
   const [submitSuccessful, setSubmitSuccessful] = useState(null);
   const [promptMessage, setPromptMessage] = useState('');
-
-  const history = useHistory();
 
   useEffect(() => {
     if (props.memberId) {
@@ -94,7 +93,7 @@ export default function MemberForm(props) {
         setTimeout(() => {
           setPromptMessage('');
           history.replace('/members');
-        }, 3000);
+        }, 1500);
       } else {
         setSubmitSuccessful(1);
         setPromptMessage(`Successfully edited current member: ${memberName}`);

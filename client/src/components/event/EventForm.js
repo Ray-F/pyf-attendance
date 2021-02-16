@@ -22,14 +22,13 @@ const useStyles = makeStyles((theme) => ({
 
 export default function EventForm(props) {
   const classes = useStyles();
+  const history = useHistory();
 
   const eventTypes = [
     'Meeting',
     'Training',
     'Project',
   ];
-
-  const history = useHistory();
 
   const [isNew, setIsNew] = useState(true);
 
