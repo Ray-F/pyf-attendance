@@ -1,9 +1,9 @@
 import React from 'react';
 import {
-  Button, Container, Grid, makeStyles, Typography,
+  Container, Grid, makeStyles, Typography,
 } from '@material-ui/core';
-import { Link } from 'react-router-dom';
 import { version } from '../../../package.json';
+import DashboardButton from '../../components/navigation/DashboardButton';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -13,30 +13,10 @@ const useStyles = makeStyles((theme) => ({
   buttonContainer: {
     margin: '20px 0',
   },
-
-  link: {
-    textDecoration: 'none',
-  },
-
-  actionButton: {
-    width: '200px',
-    height: '100px',
-    maxWidth: '100%',
-  },
 }));
 
 export default function HomePage() {
   const classes = useStyles();
-
-  function buttonFactory(link, text) {
-    return (
-      <Grid item xs={6} sm={4}>
-        <Link to={link} className={classes.link}>
-          <Button className={classes.actionButton} variant="outlined" color="primary">{text}</Button>
-        </Link>
-      </Grid>
-    );
-  }
 
   return (
     <Container className={classes.container} maxWidth="md">
@@ -48,11 +28,12 @@ export default function HomePage() {
       </Typography>
 
       <Grid container className={classes.buttonContainer} spacing={2}>
-        {buttonFactory('/events', 'Events Dashboard')}
-        {buttonFactory('/events/add', 'Quick Action: Add an event')}
-        {buttonFactory('/members', 'Members Dashboard')}
-        {buttonFactory('/members/add', 'Quick Action:\n Add a member')}
-        {buttonFactory('/attendance', 'Attendance Dashboard')}
+        <DashboardButton link="/events" text="Events Dashboard" />
+        <DashboardButton link="events/add" text="Quick Action: Add an event" />
+        <DashboardButton link="/members" text="Members Dashboard" />
+        <DashboardButton link="/members/add" text="Quick Action: Add a member" />
+        <DashboardButton link="/attendance" text="Attendance Dashboard" />
+        <DashboardButton link="/dev-dashboard" text="Development Dashboard" />
       </Grid>
     </Container>
   );
