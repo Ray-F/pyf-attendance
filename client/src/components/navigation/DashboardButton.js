@@ -22,21 +22,20 @@ export default function DashboardButton(props) {
 
   const color = props.link ? 'primary' : 'secondary';
 
-  const handleClick = () => {
-    if (props.link) {
-      history.push(props.link);
-    } else if (props.action) {
-      props.action();
-    } else {
-      throw new Error('You specified a link and an action, please remove one!');
-    }
-  };
-
-  return (
-    <Grid item xs={6} sm={4}>
-      <Link onClick={() => handleClick()} className={classes.link}>
-        <Button className={classes.actionButton} variant="outlined" color={color}>{props.text}</Button>
-      </Link>
-    </Grid>
-  );
+  if (props.link) {
+    return (
+      <Grid item xs={6} sm={4}>
+        <Link to={props.link} className={classes.link}>
+          <Button className={classes.actionButton} variant="outlined" color={color}>{props.text}</Button>
+        </Link>
+      </Grid>
+    );
+  } if (props.action) {
+    return (
+      <Grid item xs={6} sm={4}>
+        <Button className={classes.actionButton} onClick={() => props.action()} variant="outlined" color={color}>{props.text}</Button>
+      </Grid>
+    );
+  }
+  throw new Error('You specified a link and an action, please remove one!');
 }
