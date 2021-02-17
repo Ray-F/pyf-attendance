@@ -28,7 +28,7 @@ export default function DashboardButton(props) {
     } else if (props.action) {
       props.action();
     } else {
-      throw new Error('You specified a link and and action, please remove one!');
+      throw new Error('You specified a link and an action, please remove one!');
     }
   };
 
