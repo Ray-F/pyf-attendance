@@ -376,8 +376,8 @@ export default function AttendanceForm(props) {
                   </MenuItem>
                 );
               }
-              return (<></>);
-            })}
+              return null;
+            }).filter((event) => event)}
 
             <ListSubheader>
               Recent Events (
@@ -400,8 +400,8 @@ export default function AttendanceForm(props) {
                   </MenuItem>
                 );
               }
-              return (<></>);
-            })}
+              return null;
+            }).filter((event) => event)}
           </Select>
         </FormControl>
       </Grid>
