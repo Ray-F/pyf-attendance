@@ -17,6 +17,7 @@ const getCollection = (collection) => {
     case "members":
     case "events":
     case "attendance":
+    case "users":
       return mongoClient.db(config.DB_NAME).collection(collection)
     default:
       throw new Error(`No collection "${collection}" found on "${config.DB_NAME}"`)
@@ -268,6 +269,26 @@ const deleteAllAttendanceFromDb = async () => {
   return await getCollection("attendance").deleteMany({})
 }
 
+/**
+ * Returns the user and their associated scope if the user is in the users collection, or null.
+ *
+ * @param email
+ * @returns {Promise<{scope: *, email}|null>}
+ */
+const getUserByEmailFromDb = async (email) => {
+  const user = await getCollection("users").findOne({ "email": email });
+
+  if (user) {
+    return {
+      email: email,
+      scope: user.scope,
+    }
+  } else {
+    return null;
+  }
+}
+
+
 
 module.exports = {
   getEventsFromDb,
@@ -284,5 +305,6 @@ module.exports = {
   getAttendanceFromDb,
   saveAttendanceToDb,
   deleteAttendanceFromDb,
-  deleteAllAttendanceFromDb
+  deleteAllAttendanceFromDb,
+  getUserByEmailFromDb
 }

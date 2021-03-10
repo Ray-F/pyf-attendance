@@ -184,15 +184,15 @@ export default function MemberList(props) {
       disableColumnMenu: true,
       width: 60,
       renderCell: (params) => {
-        const colour = getAttendanceColour(params.getValue('attendanceAvg'));
+        const colour = getAttendanceColour(params.row.attendanceAvg);
 
-        if (params.getValue('attendanceAvg') === null) {
+        if (params.row.attendanceAvg === null) {
           return (<span style={{ color: 'grey' }}>- %</span>);
         }
 
         return (
           <span style={{ color: colour }}>
-            {params.getValue('attendanceAvg')}
+            {params.row.attendanceAvg}
             %
           </span>
         );
@@ -207,7 +207,7 @@ export default function MemberList(props) {
       width: 100,
       headerAlign: 'center',
       renderCell: (params) => {
-        const colour = getCapacityColour(params.getValue('capacityAvg'));
+        const colour = getCapacityColour(params.row.capacityAvg);
 
         return (<Box style={{ backgroundColor: colour }} className={classes.capacityIndicator} />);
       },
@@ -221,11 +221,11 @@ export default function MemberList(props) {
       width: 80,
       renderCell: (params) => (
         <Box>
-          {params.getValue('meetingsAttended')}
+          {params.row.meetingsAttended}
           {' '}
           /
           {' '}
-          {params.getValue('nShouldAttend')}
+          {params.row.nShouldAttend}
         </Box>
       ),
     },
@@ -238,10 +238,10 @@ export default function MemberList(props) {
       headerAlign: 'center',
       renderCell: (params) => (
         <Box className={classes.optionIconContainer}>
-          <IconButton onClick={() => handleViewMember(params.getValue('id'))}><VisibilityIcon /></IconButton>
+          <IconButton onClick={() => handleViewMember(params.row.id)}><VisibilityIcon /></IconButton>
           <Divider orientation="vertical" flexItem />
 
-          <Link to={`/members/add?memberId=${params.getValue('id')}`}>
+          <Link to={`/members/add?memberId=${params.row.id}`}>
             <IconButton><EditIcon /></IconButton>
           </Link>
         </Box>

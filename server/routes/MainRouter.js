@@ -11,6 +11,9 @@ router.post('/deploy', defaultController.deploy);
 // Route to reset the development database
 router.get('/api/reset-db', defaultController.resetDevelopmentDatabase);
 
+
+router.post('/api/authorize', defaultController.authorize);
+
 // To add another router:
 // const inputRouter = require('./anotherRouter');
 // router.use("/api/inputs", inputRouter);

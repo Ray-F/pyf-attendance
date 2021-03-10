@@ -323,8 +323,8 @@ export default function AttendanceForm(props) {
             step={1}
             min={1}
             max={4}
-            defaultValue={params.getValue('capacity')}
-            data-capacity={params.getValue('capacity')}
+            defaultValue={params.row.capacity}
+            data-capacity={params.row.capacity}
           />
         ),
       });
@@ -376,8 +376,8 @@ export default function AttendanceForm(props) {
                   </MenuItem>
                 );
               }
-              return (<></>);
-            })}
+              return null;
+            }).filter((event) => event)}
 
             <ListSubheader>
               Recent Events (
@@ -400,8 +400,8 @@ export default function AttendanceForm(props) {
                   </MenuItem>
                 );
               }
-              return (<></>);
-            })}
+              return null;
+            }).filter((event) => event)}
           </Select>
         </FormControl>
       </Grid>

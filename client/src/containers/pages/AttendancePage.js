@@ -15,8 +15,6 @@ export default function AttendancePage() {
   const query = new URLSearchParams(useLocation().search);
 
   return (
-    <>
-      <AttendanceForm className={classes.form} eventId={query.get('eventId')} />
-    </>
+    <AttendanceForm className={classes.form} eventId={query.get('eventId')} />
   );
 }
