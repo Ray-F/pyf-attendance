@@ -42,18 +42,19 @@ const deploy = async (req, res, next) => {
   const checksum = Buffer.from(signature, "utf8");
 
   if (checksum.length === digest.length && crypto.timingSafeEqual(digest, checksum)) {
+    res.status(200).send(`Successfully issued deployment command for release version ${newVersion}`);
+
     // Execute rebuild script
     console.log("\n\n[SERVER] Deploying new version:".yellow, newVersion.bold);
     const shellResp = shell.exec("../scripts/build.sh");
 
     if (shellResp.code === 0) {
-      res.status(200).send(`Successfully issued deployment command for release version ${newVersion}`);
+      // Exit this current instance of the server so that PM2 can automatically restart
+      process.exit(0);
     } else {
-      res.status(500).send(`Failed to execute deployment. Shell script exit code: ${shellResp.code}`);
+      console.error("[SERVER] Failed to build automatically through webhook".red);
     }
 
-    // Exit this current instance of the server so that PM2 can automatically restart
-    process.exit(0);
   } else {
     res.status(403).send("Secrets do not match");
   }
