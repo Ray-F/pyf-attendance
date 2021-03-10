@@ -180,16 +180,16 @@ export default function EventList(props) {
       disableColumnMenu: true,
       width: 160,
       renderCell: (params) => {
-        if (params.getValue('hasRecords')) {
+        if (params.row.hasRecords) {
           return (
-            <Link className={classes.linkWithAttendanceRecords} to={`/attendance?eventId=${params.getValue('id')}`}>
-              <span>{params.getValue('name')}</span>
+            <Link className={classes.linkWithAttendanceRecords} to={`/attendance?eventId=${params.row.id}`}>
+              <span>{params.row.name}</span>
             </Link>
           );
         }
         return (
-          <Link className={classes.linkWithoutAttendanceRecords} to={`/attendance?eventId=${params.getValue('id')}`}>
-            <span className={classes.recordIndicator}>{params.getValue('name')}</span>
+          <Link className={classes.linkWithoutAttendanceRecords} to={`/attendance?eventId=${params.row.id}`}>
+            <span className={classes.recordIndicator}>{params.row.name}</span>
           </Link>
         );
       },
@@ -202,7 +202,7 @@ export default function EventList(props) {
       disableColumnMenu: true,
       width: 100,
       renderCell: (params) => (
-        new Date(params.getValue('date')).toLocaleDateString('en-NZ').padStart(10, '0')
+        new Date(params.row.date).toLocaleDateString('en-NZ').padStart(10, '0')
       ),
     },
     // {
@@ -217,11 +217,11 @@ export default function EventList(props) {
       disableColumnMenu: true,
       width: 60,
       renderCell: (params) => {
-        const colour = getAttendanceColour(params.getValue('attendanceAvg'));
+        const colour = getAttendanceColour(params.row.attendanceAvg);
 
         return (
           <span style={{ color: colour }}>
-            {params.getValue('attendanceAvg')}
+            {params.row.attendanceAvg}
             %
           </span>
         );
@@ -236,7 +236,7 @@ export default function EventList(props) {
       width: 100,
       headerAlign: 'center',
       renderCell: (params) => {
-        const colour = getCapacityColour(params.getValue('capacityAvg'));
+        const colour = getCapacityColour(params.row.capacityAvg);
 
         return (<Box style={{ backgroundColor: colour }} className={classes.capacityIndicator} />);
       },
@@ -249,11 +249,11 @@ export default function EventList(props) {
       headerAlign: 'center',
       renderCell: (params) => (
         <Box className={classes.optionIconContainer}>
-          <Link to={`/events/add?eventId=${params.getValue('id')}`}>
+          <Link to={`/events/add?eventId=${params.row.id}`}>
             <IconButton><EditIcon /></IconButton>
           </Link>
           <Divider orientation="vertical" flexItem />
-          <IconButton onClick={() => handleDelete(params.getValue('id'))}><DeleteIcon /></IconButton>
+          <IconButton onClick={() => handleDelete(params.row.id)}><DeleteIcon /></IconButton>
         </Box>
       ),
     },

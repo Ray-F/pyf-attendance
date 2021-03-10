@@ -323,8 +323,8 @@ export default function AttendanceForm(props) {
             step={1}
             min={1}
             max={4}
-            defaultValue={params.getValue('capacity')}
-            data-capacity={params.getValue('capacity')}
+            defaultValue={params.row.capacity}
+            data-capacity={params.row.capacity}
           />
         ),
       });
