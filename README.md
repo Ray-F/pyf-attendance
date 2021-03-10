@@ -3,7 +3,7 @@
 
 **Author:** Raymond Feng [Ray-f](https://github.com/ray-f) (<rf.raymondfeng@gmail.com>)
 
-**Contributors:** Michael Howell [Mykhol](https://github.com/mykhol) (<michael@nunc.co.nz>), Matthew Ouyang [mouyang2001](https://github.com/mouyang2001)
+**Contributors:** Michael Howell [Mykhol](https://github.com/mykhol) (<michael@nunc.co.nz>)
 
 
 ## How to use this repository
@@ -29,4 +29,10 @@ ENV = DEV
 PORT = 9001
 ```
 
-Contact <rf.raymondfeng@gmail.com> to get a DEV URI.
+- Create a file under `client/.env` with the following fields
+
+```
+REACT_APP_GOOGLE_CLIENT_ID = <GOOGLE CLIENT ID>
+```
+
+Contact <rf.raymondfeng@gmail.com> to get a Mongo URI and Google Client ID.
