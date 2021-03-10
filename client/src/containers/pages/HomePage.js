@@ -4,7 +4,8 @@ import {
 } from '@material-ui/core';
 import { version } from '../../../package.json';
 import DashboardButton from '../../components/navigation/DashboardButton';
-import LoginButton from '../../components/LoginButton';
+import LoginButton from '../../components/auth/LoginButton';
+import LogoutButton from '../../components/auth/LogoutButton';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -18,11 +19,7 @@ const useStyles = makeStyles((theme) => ({
   logInStatus: {
     paddingRight: 20,
     textAlign: 'right',
-  },
-
-  logInStatusText: {
-    marginTop: 20,
-  },
+  }
 }));
 
 export default function HomePage({ loggedIn, user, setLoggedIn, setUser }) {
@@ -32,14 +29,14 @@ export default function HomePage({ loggedIn, user, setLoggedIn, setUser }) {
     <Container className={classes.container} maxWidth="md">
       <Grid container>
         <Grid item xs={6}>
-          <Typography variant="h4">PYF Attendance Monitor</Typography>
+          <Typography variant="h4">Attendance Monitor</Typography>
           <Typography variant="body1">
             Powered by Spprax Rocket (v{version})
           </Typography>
         </Grid>
         <Grid item xs={5} className={classes.logInStatus}>
           {(loggedIn)
-            ? <Typography className={classes.logInStatusText} variant="body2">Welcome: {user}</Typography>
+            ? <LogoutButton setUser={setUser} setLoggedIn={setLoggedIn} currentUser={user} />
             : <LoginButton setLoggedIn={setLoggedIn} setUser={setUser} />}
         </Grid>
       </Grid>
