@@ -4,6 +4,7 @@ import {
 } from '@material-ui/core';
 import { version } from '../../../package.json';
 import DashboardButton from '../../components/navigation/DashboardButton';
+import LoginButton from '../../components/LoginButton';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -13,18 +14,35 @@ const useStyles = makeStyles((theme) => ({
   buttonContainer: {
     margin: '20px 0',
   },
+
+  logInStatus: {
+    paddingRight: 20,
+    textAlign: 'right',
+  },
+
+  logInStatusText: {
+    marginTop: 20,
+  },
 }));
 
-export default function HomePage() {
+export default function HomePage({ loggedIn, user, setLoggedIn, setUser }) {
   const classes = useStyles();
 
   return (
     <Container className={classes.container} maxWidth="md">
-      <Typography variant="h4">PYF Attendance Monitor</Typography>
-      <Typography variant="body1">
-        Powered by Spprax Rocket (v{version})
-      </Typography>
-
+      <Grid container>
+        <Grid item xs={6}>
+          <Typography variant="h4">PYF Attendance Monitor</Typography>
+          <Typography variant="body1">
+            Powered by Spprax Rocket (v{version})
+          </Typography>
+        </Grid>
+        <Grid item xs={5} className={classes.logInStatus}>
+          {(loggedIn)
+            ? <Typography className={classes.logInStatusText} variant="body2">Welcome: {user}</Typography>
+            : <LoginButton setLoggedIn={setLoggedIn} setUser={setUser} />}
+        </Grid>
+      </Grid>
       <Grid container className={classes.buttonContainer} spacing={2}>
         <DashboardButton link="/events" text="Events Dashboard" />
         <DashboardButton link="events/add" text="Quick Action: Add an event" />
