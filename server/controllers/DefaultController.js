@@ -1,6 +1,6 @@
-const crypto = require('crypto')
-const config = require('../utils/Config')
-const shell = require('shelljs')
+const crypto = require("crypto");
+const config = require("../utils/Config");
+const shell = require("shelljs");
 const { getUserByEmailFromDb } = require("../models/mongodb/MongoRepository");
 
 
@@ -14,69 +14,69 @@ const { getUserByEmailFromDb } = require("../models/mongodb/MongoRepository");
  * @param {*} req.get - Function to get the specified value from the request headers.
  */
 const deploy = async (req, res, next) => {
-  const payload = JSON.stringify(req.body)
-  const signature = req.get('X-Hub-Signature-256')
+  const payload = JSON.stringify(req.body);
+  const signature = req.get("X-Hub-Signature-256");
 
   if (!payload || !signature) {
-    res.status(404).send("Payload and/or signature missing")
-    return
+    res.status(404).send("Payload and/or signature missing");
+    return;
   }
-  
+
   if (req.body.ref !== "refs/heads/master") {
-    res.status(409).send("Push was not to master")
-    return
+    res.status(409).send("Push was not to master");
+    return;
   } else if (!req.body.head_commit.message.includes("[BOT] Update project version to")) {
-    res.status(409).send("Latest commit was not a release commit")
-    return
+    res.status(409).send("Latest commit was not a release commit");
+    return;
   }
 
   // new version number from GitHub
-  const newVersion = req.body.head_commit.message.split(' ').slice(-1)[0]
+  const newVersion = req.body.head_commit.message.split(" ").slice(-1)[0];
 
   // Webhook secret
-  const secret = process.env.GH_WEBHOOK_SECRET
+  const secret = process.env.GH_WEBHOOK_SECRET;
 
   // Create comparisons to match
-  const hmac = crypto.createHmac('sha256', secret)
-  const digest = Buffer.from('sha256=' + hmac.update(payload).digest('hex'), 'utf8')
-  const checksum = Buffer.from(signature, 'utf8')
+  const hmac = crypto.createHmac("sha256", secret);
+  const digest = Buffer.from("sha256=" + hmac.update(payload).digest("hex"), "utf8");
+  const checksum = Buffer.from(signature, "utf8");
 
   if (checksum.length === digest.length && crypto.timingSafeEqual(digest, checksum)) {
     // Execute rebuild script
     console.log("\n\n[SERVER] Deploying new version:".yellow, newVersion.bold);
-    const shellResp = shell.exec('../scripts/build.sh');
+    const shellResp = shell.exec("../scripts/build.sh");
 
     if (shellResp.code === 0) {
-      res.status(200).send(`Successfully issued deployment command for release version ${newVersion}`)
+      res.status(200).send(`Successfully issued deployment command for release version ${newVersion}`);
     } else {
-      res.status(500).send(`Failed to execute deployment. Shell script exit code: ${shellResp.code}`)
+      res.status(500).send(`Failed to execute deployment. Shell script exit code: ${shellResp.code}`);
     }
 
     // Exit this current instance of the server so that PM2 can automatically restart
-    process.exit(0)
+    process.exit(0);
   } else {
-    res.status(403).send("Secrets do not match")
+    res.status(403).send("Secrets do not match");
   }
-}
+};
 
 /**
  * Resets the development database to have the same information as production database.
  */
 const resetDevelopmentDatabase = async (req, res, next) => {
   // Script arguments
-  const PROD_URI = config.DatabaseUri.PROD
-  const DEV_URI = config.DatabaseUri.DEV
-  const currentDate = Date.now()
+  const PROD_URI = config.DatabaseUri.PROD;
+  const DEV_URI = config.DatabaseUri.DEV;
+  const currentDate = Date.now();
 
   // Execute script file
-  const shellResp = shell.exec(`../scripts/reset-dev-db.sh "${PROD_URI}" "${DEV_URI}" "${currentDate}"`)
+  const shellResp = shell.exec(`../scripts/reset-dev-db.sh "${PROD_URI}" "${DEV_URI}" "${currentDate}"`);
 
   if (shellResp.code === 0) {
     res.status(200).send("200: Successfully reset development database to match production environment!");
   } else {
     res.status(500).send(`500: Error when executing shell script. Exit code ${shellResp.code}`);
   }
-}
+};
 
 /**
  * Checks if a user is authorised to use this (pyf-attendance) resource.
