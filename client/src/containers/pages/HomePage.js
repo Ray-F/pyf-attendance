@@ -36,11 +36,7 @@ export default function HomePage({ loggedIn, user, setLoggedIn, setUser }) {
         </Grid>
         <Grid item xs={5} className={classes.logInStatus}>
           {(loggedIn)
-            ? (
-              <>
-                <LogoutButton setUser={setUser} setLoggedIn={setLoggedIn} currentUser={user} />
-              </>
-            )
+            ? <LogoutButton setUser={setUser} setLoggedIn={setLoggedIn} currentUser={user} />
             : <LoginButton setLoggedIn={setLoggedIn} setUser={setUser} />}
         </Grid>
       </Grid>
