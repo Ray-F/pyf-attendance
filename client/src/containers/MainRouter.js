@@ -47,8 +47,7 @@ export default function MainRouter() {
           <Route path="/dev-dashboard" component={DevelopmentDashboardPage} />
         </RestrictedPage>
 
-        {/* Default fallback route when user is logged in. If user is not logged in, fallback to RestrictedPage */}
-        <Route path="" render={(props) => homePage(props)} />
+        <Route path="*" render={(props) => homePage(props)} />
       </Switch>
     </BrowserRouter>
   );
