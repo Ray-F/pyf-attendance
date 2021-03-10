@@ -1,6 +1,7 @@
 const crypto = require('crypto')
 const config = require('../utils/Config')
 const shell = require('shelljs')
+const { getUserByEmailFromDb } = require("../models/mongodb/MongoRepository");
 
 
 /**
@@ -77,7 +78,25 @@ const resetDevelopmentDatabase = async (req, res, next) => {
   }
 }
 
+/**
+ * Checks if a user is authorised to use this (pyf-attendance) resource.
+ */
+const authorize = async (req, res, next) => {
+  const email = req.body.verifiedEmail;
+
+  if (email) {
+    const user = await getUserByEmailFromDb(email);
+
+    if (user) {
+      res.status(200).json({});
+    } else {
+      res.status(403).json({});
+    }
+  }
+};
+
 module.exports = {
   deploy,
   resetDevelopmentDatabase,
-}
+  authorize
+};
