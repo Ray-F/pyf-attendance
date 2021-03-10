@@ -7,25 +7,6 @@ on:
     branches: [dev, master]
 
 jobs:
-  lint-front-end:
-    name: Run ESLint on client
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Setup node
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14.*
-
-      - name: Install node dependencies
-        run: cd client && npm install
-
-      - name: Run ESLint
-        run: cd client && npm run lint
-
   front-end:
     name: Build react client
     runs-on: ubuntu-latest
