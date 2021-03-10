@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import { getAttendanceColour, getCapacityColour } from '../../utils/CapacityUtils';
 import AttendanceByMemberOverTime from './graphs/AttendanceByMemberOverTime';
 import CapacityByMemberOverTime from './graphs/CapacityByMemberOverTime';
-import DisplayPaper from '../DisplayPaper';
+import DisplayPaper from '../wrappers/DisplayPaper';
 
 const useStyles = makeStyles((theme) => ({
   container: {

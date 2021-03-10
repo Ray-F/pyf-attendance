@@ -9,7 +9,7 @@ import { DataGrid } from '@material-ui/data-grid';
 import {
   amber, green, grey, orange, red,
 } from '@material-ui/core/colors';
-import FormPaper from '../FormPaper';
+import FormPaper from '../wrappers/FormPaper';
 import { getNiceDate } from '../../utils/DateTimeUtils';
 
 const useStyles = makeStyles((theme) => ({

@@ -12,8 +12,8 @@ import {
 } from 'react-vis';
 import PropTypes from 'prop-types';
 import BarSeries from 'react-vis/es/plot/series/bar-series';
-import DisplayPaper from '../../DisplayPaper';
-import Plot from '../../Plot';
+import DisplayPaper from '../../wrappers/DisplayPaper';
+import Plot from '../../wrappers/Plot';
 
 const useStyles = makeStyles((theme) => ({
   legend: {

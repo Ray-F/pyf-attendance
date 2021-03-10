@@ -2,7 +2,7 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core';
 import { useLocation } from 'react-router';
 import MemberForm from '../../components/member/MemberForm';
-import DisplayPaper from '../../components/DisplayPaper';
+import DisplayPaper from '../../components/wrappers/DisplayPaper';
 import MemberList from '../../components/member/MemberList';
 
 const useStyles = makeStyles((theme) => ({

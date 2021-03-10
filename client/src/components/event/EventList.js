@@ -15,7 +15,7 @@ import { Link } from 'react-router-dom';
 import CapacityByEventTypeOverTime from './graphs/CapacityByEventTypeOverTime';
 import { getAttendanceColour, getCapacityColour } from '../../utils/CapacityUtils';
 import AttendanceByEventTypeOverTime from './graphs/AttendanceByEventTypeOverTime';
-import DisplayPaper from '../DisplayPaper';
+import DisplayPaper from '../wrappers/DisplayPaper';
 import ConfirmDialog from '../ConfirmDialog';
 
 const useStyles = makeStyles((theme) => ({

@@ -2,7 +2,7 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core';
 import { useLocation } from 'react-router';
 import EventForm from '../../components/event/EventForm';
-import DisplayPaper from '../../components/DisplayPaper';
+import DisplayPaper from '../../components/wrappers/DisplayPaper';
 import EventList from '../../components/event/EventList';
 
 const useStyles = makeStyles((theme) => ({

@@ -4,7 +4,7 @@ import {
 } from '@material-ui/core';
 
 import { useHistory } from 'react-router-dom';
-import FormPaper from '../FormPaper';
+import FormPaper from '../wrappers/FormPaper';
 import { getDateFromDisplay, getDisplayDate } from '../../utils/DateTimeUtils';
 
 const useStyles = makeStyles((theme) => ({

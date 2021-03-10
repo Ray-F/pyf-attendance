@@ -4,8 +4,8 @@ import {
   ChartLabel, DiscreteColorLegend, FlexibleWidthXYPlot, LineSeries, XAxis, YAxis,
 } from 'react-vis';
 import PropTypes from 'prop-types';
-import DisplayPaper from '../../DisplayPaper';
-import Plot from '../../Plot';
+import DisplayPaper from '../../wrappers/DisplayPaper';
+import Plot from '../../wrappers/Plot';
 
 const useStyles = makeStyles((theme) => ({
   legend: {
