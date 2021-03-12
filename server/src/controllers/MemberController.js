@@ -1,15 +1,8 @@
-const {
-  getMembersFromDb,
-  getMemberFromDb,
-  saveMemberToDb,
-  deleteMemberFromDb,
-  deleteAllMembersFromDb,
-  deleteAttendanceFromDb,
-  deleteAllAttendanceFromDb
-} = require("../models/mongodb/MongoRepository");
-
-const { Member } = require('../models/Member')
-
+import {
+  deleteAllAttendanceFromDb, deleteAttendanceFromDb, deleteAllMembersFromDb, deleteMemberFromDb, getMemberFromDb,
+  getMembersFromDb, saveMemberToDb,
+} from '../models/mongodb/MongoRepository';
+import Member from '../models/Member';
 
 /**
  * Gets all members or a single member (if `req.query.memberId` is specified).
@@ -19,8 +12,8 @@ const { Member } = require('../models/Member')
 const getMembers = async (req, res, next) => {
   const members = req.query.memberId ? (await getMemberFromDb(req.query.memberId)).toDto()
     : (await getMembersFromDb()).map((member) => (member.toDto()));
-  res.json(members)
-}
+  res.json(members);
+};
 
 /**
  * Saves a member.
@@ -32,8 +25,8 @@ const getMembers = async (req, res, next) => {
  */
 const saveMember = async (req, res, next) => {
   await saveMemberToDb(new Member(req.body));
-  res.sendStatus(200)
-}
+  res.sendStatus(200);
+};
 
 /**
  * Deletes the specified member along with their attendance information.
@@ -41,29 +34,32 @@ const saveMember = async (req, res, next) => {
  * @param {string} req.query.memberId - The ID of the member to delete.
  */
 const deleteMember = async (req, res, next) => {
-  let memberId = req.query.memberId
+  let memberId = req.query.memberId;
 
   if (memberId) {
-    const deleteResult = await deleteMemberFromDb(memberId)
-    const deleteAttendanceResult = await deleteAttendanceFromDb(null, memberId)
+    const deleteResult = await deleteMemberFromDb(memberId);
+    const deleteAttendanceResult = await deleteAttendanceFromDb(null, memberId);
 
-    res.status(200).send(`Delete successful: ${deleteResult.result.n} member(s) and ${deleteAttendanceResult.result.n} attendance record(s) were wiped.`)
+    res.status(200).send(`Delete successful: ${deleteResult.result.n} member(s) and ${deleteAttendanceResult.result.n} attendance record(s) were wiped.`);
   } else {
-    res.status(404).send("No member Id specified! No records deleted").end()
+    res.status(404).send('No member Id specified! No records deleted').end();
   }
-}
+};
 
 /**
  * Deletes all members along with their attendance records.
  */
 const resetMembers = async (req, res, next) => {
-  const deleteResult = await deleteAllMembersFromDb()
-  const deleteAttendanceResult = await deleteAllAttendanceFromDb()
+  const deleteResult = await deleteAllMembersFromDb();
+  const deleteAttendanceResult = await deleteAllAttendanceFromDb();
 
-  res.status(200).send(`Delete successful: ${deleteResult.result.n} members and ${deleteAttendanceResult.result.n} attendance records were wiped.`)
-}
+  res.status(200).send(`Delete successful: ${deleteResult.result.n} members and ${deleteAttendanceResult.result.n} attendance records were wiped.`);
+};
 
 
-module.exports = {
-  getMembers, saveMember, deleteMember, resetMembers
-}
+export {
+  getMembers,
+  saveMember,
+  deleteMember,
+  resetMembers,
+};

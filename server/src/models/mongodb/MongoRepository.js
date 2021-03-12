@@ -1,10 +1,9 @@
-const mongoClient = require('./MongoConnection')
-const ObjectId = require('mongodb').ObjectId
-const config = require('../../utils/Config')
-const { Attendance } = require('../Attendance')
-const { Member } = require('../Member')
-const { Event } = require('../Event')
-
+import mongoClient from './MongoConnection';
+import { ObjectId } from 'mongodb';
+import config from '../../utils/Config';
+import Attendance from '../Attendance';
+import Member from '../Member';
+import Event from '../Event';
 
 /**
  * Returns the collection instance for `collectionName`.
@@ -14,15 +13,15 @@ const { Event } = require('../Event')
  */
 const getCollection = (collection) => {
   switch (collection) {
-    case "members":
-    case "events":
-    case "attendance":
-    case "users":
-      return mongoClient.db(config.DB_NAME).collection(collection)
+    case 'members':
+    case 'events':
+    case 'attendance':
+    case 'users':
+      return mongoClient.db(config.DB_NAME).collection(collection);
     default:
-      throw new Error(`No collection "${collection}" found on "${config.DB_NAME}"`)
+      throw new Error(`No collection "${collection}" found on "${config.DB_NAME}"`);
   }
-}
+};
 
 /**
  * Get members from the member collection.
@@ -30,15 +29,15 @@ const getCollection = (collection) => {
  * @returns {Promise<Member[]>}
  */
 const getMembersFromDb = async () => {
-  return (await getCollection("members").find({}).toArray())
+  return (await getCollection('members').find({}).toArray())
     .map((member) => new Member(
       {
         id: member._id,
         fullName: member.fullName,
         startDate: member.startDate,
-        endDate: member.endDate
-      }))
-}
+        endDate: member.endDate,
+      }));
+};
 
 /**
  * Gets a single member with `memberId` from the members collection.
@@ -47,9 +46,9 @@ const getMembersFromDb = async () => {
  * @returns {Promise<Member>}
  */
 const getMemberFromDb = async (memberId) => {
-  const mongoMember = await getCollection("members").findOne({ "_id": ObjectId(memberId)})
+  const mongoMember = await getCollection('members').findOne({ '_id': ObjectId(memberId) });
   return new Member(mongoMember);
-}
+};
 
 /**
  * Saves a `memberObject` to the members collection.
@@ -63,15 +62,15 @@ const saveMemberToDb = async (member) => {
   // If an member ID was passed to this function, then update existing record
   if (member.id) {
     const mongoMember = member.toDbo();
-    const query = { _id: mongoMember._id }
-    const update = { $set: mongoMember }
-    const options = { upsert: false }
+    const query = { _id: mongoMember._id };
+    const update = { $set: mongoMember };
+    const options = { upsert: false };
 
-    return await getCollection("members").updateOne(query, update, options)
+    return await getCollection('members').updateOne(query, update, options);
   } else {
-    return await getCollection("members").insertOne(member.toDbo())
+    return await getCollection('members').insertOne(member.toDbo());
   }
-}
+};
 
 /**
  * Deletes a member with `memberId` from the members collection.
@@ -81,13 +80,13 @@ const saveMemberToDb = async (member) => {
  */
 const deleteMemberFromDb = async (memberId) => {
   const query = {
-    "_id": {
-      $eq: ObjectId(memberId)
-    }
-  }
+    '_id': {
+      $eq: ObjectId(memberId),
+    },
+  };
 
-  return await getCollection("members").deleteOne(query)
-}
+  return await getCollection('members').deleteOne(query);
+};
 
 /**
  * Deletes all members from the members collection.
@@ -95,8 +94,8 @@ const deleteMemberFromDb = async (memberId) => {
  * @returns {Promise<*>}
  */
 const deleteAllMembersFromDb = async () => {
-  return await getCollection("members").deleteMany({})
-}
+  return await getCollection('members').deleteMany({});
+};
 
 /**
  * Gets all events from the events collection.
@@ -104,9 +103,9 @@ const deleteAllMembersFromDb = async () => {
  * @returns {Promise<Event[]>}
  */
 const getEventsFromDb = async () => {
-  return (await getCollection("events").find({}).toArray())
-    .map((event) => new Event(event))
-}
+  return (await getCollection('events').find({}).toArray())
+    .map((event) => new Event(event));
+};
 
 /**
  * Gets a single event with `eventId` from the events collection.
@@ -115,9 +114,9 @@ const getEventsFromDb = async () => {
  * @returns {Promise<Event>}
  */
 const getEventFromDb = async (eventId) => {
-  const mongoEvent = await getCollection("events").findOne({ "_id": ObjectId(eventId) });
-  return (new Event(mongoEvent))
-}
+  const mongoEvent = await getCollection('events').findOne({ '_id': ObjectId(eventId) });
+  return (new Event(mongoEvent));
+};
 
 /**
  * Saves an event to the events collection.
@@ -127,16 +126,16 @@ const getEventFromDb = async (eventId) => {
  */
 const saveEventToDb = async (event) => {
   if (event.id) {
-    const mongoEvent = event.toDbo()
-    const query = { _id : mongoEvent._id }
-    const update = { $set: mongoEvent }
-    const options = { upsert: true }
+    const mongoEvent = event.toDbo();
+    const query = { _id: mongoEvent._id };
+    const update = { $set: mongoEvent };
+    const options = { upsert: true };
 
-    return await getCollection("events").updateOne(query, update, options)
+    return await getCollection('events').updateOne(query, update, options);
   } else {
-    return await getCollection("events").insertOne(event.toDbo())
+    return await getCollection('events').insertOne(event.toDbo());
   }
-}
+};
 
 /**
  * Deletes an event with `eventId` from the events collection.
@@ -146,13 +145,13 @@ const saveEventToDb = async (event) => {
  */
 const deleteEventFromDb = async (eventId) => {
   const query = {
-    "_id": {
-      $eq: ObjectId(eventId)
-    }
-  }
+    '_id': {
+      $eq: ObjectId(eventId),
+    },
+  };
 
-  return await getCollection("events").deleteOne(query)
-}
+  return await getCollection('events').deleteOne(query);
+};
 
 /**
  * Deletes all events from the events collection.
@@ -160,8 +159,8 @@ const deleteEventFromDb = async (eventId) => {
  * @returns {Promise<*>}
  */
 const deleteAllEventsFromDb = async () => {
-  return await getCollection("events").deleteMany({})
-}
+  return await getCollection('events').deleteMany({});
+};
 
 /**
  * Updates an event(s) to have the `event.hasAttendanceRecords` field set to `recorded` value.
@@ -172,16 +171,16 @@ const deleteAllEventsFromDb = async () => {
  */
 const setEventRecorded = async (eventId = null, recorded = true) => {
   const query = {
-    $set: { hasAttendanceRecords: recorded }
-  }
+    $set: { hasAttendanceRecords: recorded },
+  };
 
   if (eventId) {
-    const filter = { _id: ObjectId(eventId) }
-    return await getCollection("events").updateOne(filter, query)
+    const filter = { _id: ObjectId(eventId) };
+    return await getCollection('events').updateOne(filter, query);
   }
 
-  return await getCollection("events").updateMany({}, query)
-}
+  return await getCollection('events').updateMany({}, query);
+};
 
 /**
  * Gets attendance records from the attendance collection.
@@ -191,19 +190,19 @@ const setEventRecorded = async (eventId = null, recorded = true) => {
  * @returns {Promise<Attendance[]>}
  */
 const getAttendanceFromDb = async (eventId = null, memberId = null) => {
-  let attendanceDboObjects
+  let attendanceDboObjects;
   if (eventId) {
-    attendanceDboObjects = await getCollection("attendance")
-      .find({ "event.eventId": ObjectId(eventId) })
-      .sort({'_id' : -1})
-      .toArray()
+    attendanceDboObjects = await getCollection('attendance')
+      .find({ 'event.eventId': ObjectId(eventId) })
+      .sort({ '_id': -1 })
+      .toArray();
   } else if (memberId) {
-    attendanceDboObjects = await getCollection("attendance")
-      .find({ "member.memberId": ObjectId(memberId) })
-      .sort({'_id' : -1})
-      .toArray()
+    attendanceDboObjects = await getCollection('attendance')
+      .find({ 'member.memberId': ObjectId(memberId) })
+      .sort({ '_id': -1 })
+      .toArray();
   } else {
-    attendanceDboObjects = await getCollection("attendance").find({}).sort({'_id' : -1}).toArray()
+    attendanceDboObjects = await getCollection('attendance').find({}).sort({ '_id': -1 }).toArray();
   }
 
   return attendanceDboObjects.map((dboObject) => new Attendance(
@@ -213,14 +212,14 @@ const getAttendanceFromDb = async (eventId = null, memberId = null) => {
       fullName: dboObject.member.fullName,
       eventId: dboObject.event.eventId.toString(),
       eventType: dboObject.event.type,
-      isLate: (dboObject.isLate === "true" || dboObject.isLate === true),
-      isAbsent: (dboObject.isAbsent === "true" || dboObject.isAbsent === true),
-      isExcused: (dboObject.isExcused === "true" || dboObject.isExcused === true),
+      isLate: (dboObject.isLate === 'true' || dboObject.isLate === true),
+      isAbsent: (dboObject.isAbsent === 'true' || dboObject.isAbsent === true),
+      isExcused: (dboObject.isExcused === 'true' || dboObject.isExcused === true),
       excuseReason: dboObject.excuseReason,
-      capacity: dboObject.capacity
-    }
-  ))
-}
+      capacity: dboObject.capacity,
+    },
+  ));
+};
 
 /**
  * Saves attendance records to attendance collection.
@@ -229,9 +228,9 @@ const getAttendanceFromDb = async (eventId = null, memberId = null) => {
  * @returns {Promise<*>}
  */
 const saveAttendanceToDb = async (attendanceArray) => {
-  const attendanceDboObjects = attendanceArray.map((attendance) => attendance.toDbo())
-  return await getCollection("attendance").insertMany(attendanceDboObjects)
-}
+  const attendanceDboObjects = attendanceArray.map((attendance) => attendance.toDbo());
+  return await getCollection('attendance').insertMany(attendanceDboObjects);
+};
 
 /**
  * Deletes attendance records for an event or member from the attendance collection.
@@ -239,26 +238,26 @@ const saveAttendanceToDb = async (attendanceArray) => {
  * @returns {Promise<*>}
  */
 const deleteAttendanceFromDb = async (eventId = null, memberId = null) => {
-  let query
+  let query;
 
   if (eventId) {
     query = {
-      "event.eventId": {
-        $eq: ObjectId(eventId)
-      }
-    }
+      'event.eventId': {
+        $eq: ObjectId(eventId),
+      },
+    };
   } else if (memberId) {
     query = {
-      "member.memberId": {
-        $eq: ObjectId(memberId)
-      }
-    }
+      'member.memberId': {
+        $eq: ObjectId(memberId),
+      },
+    };
   } else {
-    throw new Error("IllegalArgumentException: Unspecified event or member Id to delete attendance")
+    throw new Error('IllegalArgumentException: Unspecified event or member Id to delete attendance');
   }
 
-  return await getCollection("attendance").deleteMany(query)
-}
+  return await getCollection('attendance').deleteMany(query);
+};
 
 /**
  * Deletes all attendance records from the attendance collection.
@@ -266,8 +265,8 @@ const deleteAttendanceFromDb = async (eventId = null, memberId = null) => {
  * @returns {Promise<*>}
  */
 const deleteAllAttendanceFromDb = async () => {
-  return await getCollection("attendance").deleteMany({})
-}
+  return await getCollection('attendance').deleteMany({});
+};
 
 /**
  * Returns the user and their associated scope if the user is in the users collection, or null.
@@ -276,21 +275,20 @@ const deleteAllAttendanceFromDb = async () => {
  * @returns {Promise<{scope: *, email}|null>}
  */
 const getUserByEmailFromDb = async (email) => {
-  const user = await getCollection("users").findOne({ "email": email });
+  const user = await getCollection('users').findOne({ 'email': email });
 
   if (user) {
     return {
       email: email,
       scope: user.scope,
-    }
+    };
   } else {
     return null;
   }
-}
+};
 
 
-
-module.exports = {
+export {
   getEventsFromDb,
   getEventFromDb,
   saveEventToDb,
@@ -306,5 +304,5 @@ module.exports = {
   saveAttendanceToDb,
   deleteAttendanceFromDb,
   deleteAllAttendanceFromDb,
-  getUserByEmailFromDb
-}
+  getUserByEmailFromDb,
+};

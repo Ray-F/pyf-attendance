@@ -1,10 +1,8 @@
-const { saveAttendanceToDb } = require("../models/mongodb/MongoRepository");
-const {
-  deleteAttendanceFromDb, setEventRecorded, deleteAllAttendanceFromDb, getEventFromDb,
-  getMembersFromDb, getAttendanceFromDb
-} = require('../models/mongodb/MongoRepository')
-
-const { Attendance } = require('../models/Attendance')
+import {
+  deleteAllAttendanceFromDb, deleteAttendanceFromDb, getAttendanceFromDb, getEventFromDb, getMembersFromDb,
+  saveAttendanceToDb, setEventRecorded,
+} from '../models/mongodb/MongoRepository';
+import Attendance from '../models/Attendance';
 
 
 /**
@@ -14,29 +12,29 @@ const { Attendance } = require('../models/Attendance')
  * @param {string} [req.query.memberId] - The ID for the member we are getting attendance records for.
  */
 const getAttendance = async (req, res, next) => {
-  const eventId = req.query.eventId
-  const memberId = req.query.memberId
+  const eventId = req.query.eventId;
+  const memberId = req.query.memberId;
 
-  let attendanceRecords
+  let attendanceRecords;
 
   // Set attendance records to return dependent on whether these are for an event, member or neither
   if (eventId) {
-    const event = await getEventFromDb(eventId)
+    const event = await getEventFromDb(eventId);
 
     // If the event has attendance records, get these from the database, otherwise, generate new attendance records
     if (event.hasAttendanceRecords) {
-      attendanceRecords = await getAttendanceFromDb(eventId)
+      attendanceRecords = await getAttendanceFromDb(eventId);
     } else {
-      attendanceRecords = await generateNewAttendanceRecords(event)
+      attendanceRecords = await generateNewAttendanceRecords(event);
     }
   } else if (memberId) {
-    attendanceRecords = await getAttendanceFromDb(null, memberId)
+    attendanceRecords = await getAttendanceFromDb(null, memberId);
   } else {
-    attendanceRecords = await getAttendanceFromDb()
+    attendanceRecords = await getAttendanceFromDb();
   }
 
-  res.json(attendanceRecords.map((attendance) => attendance.toDto()))
-}
+  res.json(attendanceRecords.map((attendance) => attendance.toDto()));
+};
 
 /**
  * Generates new attendance records for a specific `event`. Only called when this is the first time generating
@@ -47,30 +45,30 @@ const getAttendance = async (req, res, next) => {
  * @returns {Attendance[]}
  */
 const generateNewAttendanceRecords = async (event) => {
-  const members = await getMembersFromDb()
+  const members = await getMembersFromDb();
 
   return members.filter(member => {
-    const eventDate = event.date
+    const eventDate = event.date;
 
     if (member.endDate) {
-      return (eventDate >= member.startDate && eventDate <= member.endDate)
+      return (eventDate >= member.startDate && eventDate <= member.endDate);
     } else {
-      return (eventDate >= member.startDate)
+      return (eventDate >= member.startDate);
     }
   }).map((member) => new Attendance(
-      {
-        memberId: member.id,
-        fullName: member.fullName,
-        eventId: event.id,
-        eventType: event.type,
-        isLate: false,
-        isAbsent: false,
-        isExcused: false,
-        excuseReason: '',
-        capacity: 1
-      }
-    ))
-}
+    {
+      memberId: member.id,
+      fullName: member.fullName,
+      eventId: event.id,
+      eventType: event.type,
+      isLate: false,
+      isAbsent: false,
+      isExcused: false,
+      excuseReason: '',
+      capacity: 1,
+    },
+  ));
+};
 
 /**
  * Saves the attendance records.
@@ -100,23 +98,23 @@ const saveAttendance = async (req, res, next) => {
       isLate: record.isShort,
       excuseReason: record.excuseReason,
       capacity: record.capacity,
-    }
-  ))
-  const eventId = req.body[0].eventId
-  const eventObject = await getEventFromDb(eventId)
+    },
+  ));
+  const eventId = req.body[0].eventId;
+  const eventObject = await getEventFromDb(eventId);
 
   if (eventObject) {
     if (eventObject.hasAttendanceRecords) {
-      await deleteAttendanceFromDb(eventId)
+      await deleteAttendanceFromDb(eventId);
     }
 
-    await setEventRecorded(eventId, true)
-    await saveAttendanceToDb(records)
-    res.sendStatus(200)
+    await setEventRecorded(eventId, true);
+    await saveAttendanceToDb(records);
+    res.sendStatus(200);
   } else {
-    res.sendStatus(500)
+    res.sendStatus(500);
   }
-}
+};
 
 /**
  * Deletes attendance records for the specified member or event.
@@ -126,33 +124,35 @@ const saveAttendance = async (req, res, next) => {
  */
 const deleteAttendance = async (req, res, next) => {
   if (req.query.eventId) {
-    const deleteAttendanceResult = await deleteAttendanceFromDb(req.query.eventId)
-    await setEventRecorded(req.query.eventId, false)
+    const deleteAttendanceResult = await deleteAttendanceFromDb(req.query.eventId);
+    await setEventRecorded(req.query.eventId, false);
 
-    res.send(`Delete successful: ${deleteAttendanceResult.result.n} attendance records deleted for event ${req.query.eventId}`)
+    res.send(
+      `Delete successful: ${deleteAttendanceResult.result.n} attendance records deleted for event ${req.query.eventId}`);
   } else if (req.query.memberId) {
-    const deleteAttendanceResult = await deleteAttendanceFromDb(null, req.query.memberId)
+    const deleteAttendanceResult = await deleteAttendanceFromDb(null, req.query.memberId);
 
-    res.send(`Delete successful: ${deleteAttendanceResult.result.n} attendance records deleted for member ${req.query.memberId}`)
+    res.send(
+      `Delete successful: ${deleteAttendanceResult.result.n} attendance records deleted for member ${req.query.memberId}`);
   } else {
-    res.status(404).send("No event/member Id specified! No records deleted")
+    res.status(404).send('No event/member Id specified! No records deleted');
   }
-}
+};
 
 /**
  * Delete all attendance records.
  */
 const resetAttendance = async (req, res, next) => {
-  const deleteAttendanceResult = await deleteAllAttendanceFromDb()
-  await setEventRecorded(null, false)
+  const deleteAttendanceResult = await deleteAllAttendanceFromDb();
+  await setEventRecorded(null, false);
 
-  res.send(`Delete successful: ${deleteAttendanceResult.result.n} attendance records deleted`)
-}
+  res.send(`Delete successful: ${deleteAttendanceResult.result.n} attendance records deleted`);
+};
 
 
-module.exports = {
+export {
   getAttendance,
   saveAttendance,
   resetAttendance,
-  deleteAttendance
-}
+  deleteAttendance,
+};

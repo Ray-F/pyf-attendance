@@ -33,4 +33,5 @@ app.use((err, req, res) => {
   res.status(err.status || 500).send(err.message);
 });
 
-module.exports = app;
+
+export default app;

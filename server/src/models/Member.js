@@ -1,5 +1,4 @@
-const ObjectId = require('mongodb').ObjectId
-
+import { ObjectId } from 'mongodb';
 
 class Member {
 
@@ -30,7 +29,7 @@ class Member {
    * @param {Date|string} obj.startDate - The starting date of the member.
    * @param {Date|string} [obj.endDate] - the leaving date of the member.
    */
-  constructor({id, _id, fullName, startDate, endDate}) {
+  constructor({ id, _id, fullName, startDate, endDate }) {
     this.id = id || _id || null;
     if (this.id) {
       this.id = this.id.toString();
@@ -51,8 +50,8 @@ class Member {
       _id: this.id,
       fullName: this.fullName,
       startDate: this.startDate,
-      endDate: this.endDate || undefined
-    }
+      endDate: this.endDate || undefined,
+    };
   }
 
   /**
@@ -65,11 +64,10 @@ class Member {
       _id: this.id ? ObjectId(this.id) : undefined,
       fullName: this.fullName,
       startDate: this.startDate,
-      endDate: this.endDate || undefined
-    }
+      endDate: this.endDate || undefined,
+    };
   }
 }
 
-module.exports = {
-  Member
-}
+
+export default Member;

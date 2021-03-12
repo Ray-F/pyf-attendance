@@ -1,5 +1,4 @@
-const ObjectId = require('mongodb').ObjectId
-
+import { ObjectId } from 'mongodb';
 
 class Attendance {
   /**
@@ -65,8 +64,8 @@ class Attendance {
    * @param {string} obj.excuseReason - The excuse reason if they were excused.
    * @param {number} obj.capacity - The capacity of the member if applicable.
    */
-  constructor({id, memberId, fullName, eventId, eventType, isLate, isAbsent, isExcused, excuseReason, capacity}) {
-    this.id = id || new ObjectId().toString()
+  constructor({ id, memberId, fullName, eventId, eventType, isLate, isAbsent, isExcused, excuseReason, capacity }) {
+    this.id = id || new ObjectId().toString();
     this.isLate = isLate;
     this.isAbsent = isAbsent;
     this.isExcused = isExcused;
@@ -81,8 +80,8 @@ class Attendance {
       this.memberId, this.fullName, this.eventId,
       this.eventType, this.isAbsent, this.isLate, this.isExcused,
       this.excuseReason, this.capacity].includes(undefined)) {
-      console.log(this)
-      throw new Error("IllegalArgumentException: Missing parameter for attendance object!")
+      console.log(this);
+      throw new Error('IllegalArgumentException: Missing parameter for attendance object!');
     }
   }
 
@@ -102,8 +101,8 @@ class Attendance {
       isAbsent: this.isAbsent,
       isExcused: this.isExcused,
       excuseReason: this.excuseReason,
-      capacity: this.capacity
-    }
+      capacity: this.capacity,
+    };
   }
 
   /**
@@ -117,23 +116,21 @@ class Attendance {
 
       event: {
         eventId: ObjectId(this.eventId),
-        type: this.eventType
+        type: this.eventType,
       },
       member: {
         memberId: ObjectId(this.memberId),
-        fullName: this.fullName
+        fullName: this.fullName,
       },
 
       isLate: this.isLate,
       isAbsent: this.isAbsent,
       isExcused: this.isExcused,
       excuseReason: this.excuseReason,
-      capacity: this.capacity
-    }
+      capacity: this.capacity,
+    };
   }
 }
 
 
-module.exports = {
-  Attendance
-}
+export default Attendance;

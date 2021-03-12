@@ -1,5 +1,4 @@
-const ObjectId = require('mongodb').ObjectId
-
+import { ObjectId } from 'mongodb';
 
 class Event {
 
@@ -38,7 +37,7 @@ class Event {
    * @param {Date|string} obj.date - The date of the event.
    * @param {boolean} obj.hasAttendanceRecords - If the event has attendance records.
    */
-  constructor({id, _id, title, type, date, hasAttendanceRecords}) {
+  constructor({ id, _id, title, type, date, hasAttendanceRecords }) {
     this.id = id || _id || null;
     if (this.id) {
       this.id = this.id.toString();
@@ -60,8 +59,8 @@ class Event {
       title: this.title,
       type: this.type,
       date: this.date,
-      hasAttendanceRecords: this.hasAttendanceRecords
-    }
+      hasAttendanceRecords: this.hasAttendanceRecords,
+    };
   }
 
   /**
@@ -75,12 +74,10 @@ class Event {
       title: this.title,
       type: this.type,
       date: this.date,
-      hasAttendanceRecords: this.hasAttendanceRecords
-    }
+      hasAttendanceRecords: this.hasAttendanceRecords,
+    };
   }
 }
 
 
-module.exports = {
-  Event
-}
+export default Event;
