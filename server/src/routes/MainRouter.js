@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { deploy, resetDevelopmentDatabase, authorize } from '../controllers/DefaultController';
+import AttendanceRouter from './AttendanceRouter';
 
 const router = Router();
 
@@ -12,12 +13,7 @@ router.get('/api/reset-db', resetDevelopmentDatabase);
 // Route to authorize a login request
 router.post('/api/authorize', authorize);
 
-// To add another router:
-// const inputRouter = require('./anotherRouter');
-// router.all("/api/inputs", inputRouter);
-
-const attendanceRouter = require('./AttendanceRouter');
-router.all('/api', attendanceRouter);
-
+// Route for all other api calls (i.e. attendance related)
+router.use('/api', AttendanceRouter);
 
 export default router;

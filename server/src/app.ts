@@ -2,13 +2,14 @@ import express from 'express';
 import * as path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
+import router from './routes/MainRouter';
 
 const app = express();
 
 // Set view engine to 'pug'
 app.set('view engine', 'pug');
 
-app.use(logger("dev"));
+app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -17,7 +18,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../../client/build-latest')));
 
 // Routes for all API required actions
-app.use('/', require('./routes/MainRouter.js'));
+app.use('/', router);
 
 // Redirect all other requests to client SPA
 app.get('*', (req, res) => {
