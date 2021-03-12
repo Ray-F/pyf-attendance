@@ -1,14 +1,13 @@
 {
   "name": "pyf-attendance-server",
   "version": "1.3.4",
-  "private": true,
+  "license": "MIT",
+  "private": false,
   "scripts": {
+    "dev": "nodemon -e js,json,ts --watch src --exec babel-node ./src/bin/www.js --extensions '.ts,.js'",
     "clean": "rm -rf dist",
     "prebuild": "yarn run clean",
     "build": "babel src -d dist --extensions '.ts,.js'",
-
-    "dev": "nodemon --exec babel-node ./src/bin/www.js --extensions '.ts,.js'",
-
     "prestart": "yarn run build",
     "start": "node dist/bin/www.js"
   },
