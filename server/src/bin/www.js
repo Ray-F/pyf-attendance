@@ -4,7 +4,7 @@ require('colors')
 
 // Dependencies for the web application
 const config = require('../utils/Config')
-const { version } = require('../package.json')
+const { version } = require('../../package.json')
 const app = require('../app')
 const debug = require('debug')
 const http = require('http')

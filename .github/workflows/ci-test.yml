@@ -25,8 +25,6 @@ jobs:
 
       - name: Run build script
         run: cd client && npm run-script build
-        env:
-          CI: ""
 
   back-end:
     name: Start node server on production
@@ -45,11 +43,10 @@ jobs:
         run: cd server && npm install
 
       - name: Start node server
-        run: cd server && npm run start-ci
+        run: cd server && npm run start
         env:
           MONGODB_URI_PROD: ${{ secrets.MONGODB_URI_PROD }}
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           ENV: PROD
           CI: true
           PORT: 9001
-

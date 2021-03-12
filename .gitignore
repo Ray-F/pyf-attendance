@@ -3,6 +3,7 @@
 /node_modules
 
 # builds
+*/dist
 */build
 */build-latest
 /build
