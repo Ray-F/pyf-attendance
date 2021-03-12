@@ -46,7 +46,7 @@ const deploy = async (req, res, next) => {
 
     // Execute rebuild script
     console.log("\n\n[SERVER] Deploying new version:".yellow, newVersion.bold);
-    const shellResp = shell.exec("../../scripts/build.sh");
+    const shellResp = shell.exec("../scripts/build.sh");
 
     if (shellResp.code === 0) {
       // Exit this current instance of the server so that PM2 can automatically restart
@@ -70,7 +70,7 @@ const resetDevelopmentDatabase = async (req, res, next) => {
   const currentDate = Date.now();
 
   // Execute script file
-  const shellResp = shell.exec(`../../scripts/reset-dev-db.sh "${PROD_URI}" "${DEV_URI}" "${currentDate}"`);
+  const shellResp = shell.exec(`../scripts/reset-dev-db.sh "${PROD_URI}" "${DEV_URI}" "${currentDate}"`);
 
   if (shellResp.code === 0) {
     res.status(200).send("200: Successfully reset development database to match production environment!");
