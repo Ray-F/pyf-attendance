@@ -363,16 +363,9 @@ export default function AttendanceForm(props) {
             {recentEvents.map((event, index) => {
               if (!event.hasAttendanceRecords) {
                 return (
-                  <MenuItem
-                    value={event._id}
-                    key={index}
-                  >
-                    {event.title}
-                    {' '}
-                    –
-                    {getNiceDate(event.date)}
-&nbsp;
-                    <i className={classes.newIndicator}>{event.hasAttendanceRecords ? '' : 'to submit'}</i>
+                  <MenuItem value={event._id} key={index}>
+                    {`${event.title} – ${getNiceDate(event.date)}`}
+                    <i className={classes.newIndicator}>to submit</i>
                   </MenuItem>
                 );
               }
@@ -388,15 +381,8 @@ export default function AttendanceForm(props) {
             {recentEvents.map((event, index) => {
               if (event.hasAttendanceRecords) {
                 return (
-                  <MenuItem
-                    value={event._id}
-                    key={index}
-                  >
-                    {event.title}
-                    {' '}
-                    –
-                    {getNiceDate(event.date)}&nbsp;
-                    <i className={classes.newIndicator}>{event.hasAttendanceRecords ? '' : 'to submit'}</i>
+                  <MenuItem value={event._id} key={index}>
+                    {`${event.title} – ${getNiceDate(event.date)}`}
                   </MenuItem>
                 );
               }
