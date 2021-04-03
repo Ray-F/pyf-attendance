@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
-  Box, Checkbox, FormControl, FormHelperText, Grid, InputLabel,
-  makeStyles, MenuItem, Select, Slider, TextField, Typography, ListSubheader, Link, Button,
+  Box, Checkbox, FormControl, Grid, InputLabel, Link, ListSubheader, makeStyles, MenuItem, Select, Slider, TextField,
+  Typography,
 } from '@material-ui/core';
 
 import { DataGrid } from '@material-ui/data-grid';
-import {
-  amber, green, grey, orange, red,
-} from '@material-ui/core/colors';
+import { amber, green, grey, orange, red } from '@material-ui/core/colors';
 import FormPaper from '../wrappers/FormPaper';
 import { getNiceDate } from '../../utils/DateTimeUtils';
 
@@ -298,7 +296,7 @@ export default function AttendanceForm(props) {
       renderCell: (params) => (
         <TextField
           className={classes.reasonField}
-          disabled={!params.getValue('isExcused')}
+          disabled={!(params.getValue('isAbsent') || params.getValue('isShort'))}
           defaultValue={params.getValue('excuseReason')}
           onBlur={(e) => handleExcuseReasonChange(e.target.value, params)}
         />
