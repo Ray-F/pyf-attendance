@@ -6,13 +6,22 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
+import { makeStyles } from '@material-ui/core';
 
-const Transition = React.forwardRef((props, ref) => (<Slide direction="up" ref={ref} {...props} />));
+const Transition = React.forwardRef((props, ref) => (<Slide direction="up" ref={ref} {...props} />))
 
-function ConfirmDialog(props) {
+const useStyles = makeStyles((theme) => ({
+  buttonContainer: {
+    padding: theme.spacing(3),
+  }
+}));
+
+export default function ConfirmDialog(props) {
   const {
     title, children, open, setOpen, onConfirm,
   } = props;
+
+  const classes = useStyles();
 
   return (
     <Dialog
@@ -24,14 +33,8 @@ function ConfirmDialog(props) {
     >
       <DialogTitle id="alert-dialog-slide-title">{title}</DialogTitle>
       <DialogContent><DialogContentText id="alert-dialog-slide-description">{children}</DialogContentText></DialogContent>
-      <DialogActions>
-        <Button
-          variant="contained"
-          onClick={() => setOpen(false)}
-          color="secondary"
-        >
-          No
-        </Button>
+      <DialogActions className={classes.buttonContainer}>
+        <Button variant="contained" onClick={() => setOpen(false)} color="secondary">No</Button>
         <Button
           variant="contained"
           onClick={() => {
@@ -39,12 +42,8 @@ function ConfirmDialog(props) {
             onConfirm();
           }}
           color="default"
-        >
-          Yes
-        </Button>
+        >Yes</Button>
       </DialogActions>
     </Dialog>
   );
 }
-
-export default ConfirmDialog;
