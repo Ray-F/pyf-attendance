@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
 export default function MainRouter() {
   const classes = useStyles();
 
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(0);
   const [user, setUser] = useState('');
 
   const homePage = (props) => (

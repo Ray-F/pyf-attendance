@@ -1,11 +1,12 @@
 import React from 'react';
 import {
-  Container, Grid, makeStyles, Typography,
+  Container, Grid, Hidden, makeStyles, Typography,
 } from '@material-ui/core';
 import { version } from '../../../package.json';
 import DashboardButton from '../../components/navigation/DashboardButton';
 import LoginButton from '../../components/auth/LoginButton';
 import LogoutButton from '../../components/auth/LogoutButton';
+import SCOPE from '../../utils/Scope';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -41,12 +42,12 @@ export default function HomePage({ loggedIn, user, setLoggedIn, setUser }) {
         </Grid>
       </Grid>
       <Grid container className={classes.buttonContainer} spacing={2}>
-        <DashboardButton link="/events" text="Events Dashboard" />
-        <DashboardButton link="events/add" text="Quick Action: Add an event" />
-        <DashboardButton link="/members" text="Members Dashboard" />
-        <DashboardButton link="/members/add" text="Quick Action: Add a member" />
-        <DashboardButton link="/attendance" text="Attendance Dashboard" />
-        <DashboardButton link="/dev-dashboard" text="Development Dashboard" />
+        <DashboardButton link="/events" text="Events Dashboard" visible={loggedIn >= SCOPE.VIEWER} />
+        <DashboardButton link="events/add" text="Quick Action: Add an event" visible={loggedIn >= SCOPE.EDITOR} />
+        <DashboardButton link="/members" text="Members Dashboard" visible={loggedIn >= SCOPE.VIEWER} />
+        <DashboardButton link="/members/add" text="Quick Action: Add a member" visible={loggedIn >= SCOPE.EDITOR} />
+        <DashboardButton link="/attendance" text="Attendance Dashboard" visible={loggedIn >= SCOPE.EDITOR} />
+        <DashboardButton link="/dev-dashboard" text="Development Dashboard" visible={loggedIn >= SCOPE.DEVELOPER} />
       </Grid>
     </Container>
   );

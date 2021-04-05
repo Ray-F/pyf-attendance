@@ -1,0 +1,11 @@
+const SCOPE = {
+  NONE: 0,
+  HAUORA_MEMBER: 11,
+  HAUORA_LEAD: 12,
+  VIEWER: 21,
+  EDITOR: 31,
+  ADMIN: 41,
+  DEVELOPER: 100,
+}
+
+export default SCOPE;

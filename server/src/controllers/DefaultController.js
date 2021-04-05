@@ -88,7 +88,7 @@ const authorize = async (req, res, next) => {
     const user = await getUserByEmailFromDb(email);
 
     if (user) {
-      res.status(200).json({});
+      res.status(200).json({ scope: user.scope });
     } else {
       res.status(403).json({});
     }
