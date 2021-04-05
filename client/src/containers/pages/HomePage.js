@@ -47,6 +47,7 @@ export default function HomePage({ loggedIn, user, setLoggedIn, setUser }) {
         <DashboardButton link="/members" text="Members Dashboard" visible={loggedIn >= SCOPE.VIEWER} />
         <DashboardButton link="/members/add" text="Quick Action: Add a member" visible={loggedIn >= SCOPE.EDITOR} />
         <DashboardButton link="/attendance" text="Attendance Dashboard" visible={loggedIn >= SCOPE.EDITOR} />
+        <DashboardButton link="/hauora" text="Hauora Dashboard" visible={loggedIn >= SCOPE.HAUORA_MEMBER} />
         <DashboardButton link="/dev-dashboard" text="Development Dashboard" visible={loggedIn >= SCOPE.DEVELOPER} />
       </Grid>
     </Container>

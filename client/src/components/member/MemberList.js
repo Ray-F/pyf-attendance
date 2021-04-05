@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function MemberList(props) {
+export default function MemberList({ enableAttendance = true, enableCapacity = true, enableEditing = true }) {
   const classes = useStyles();
 
   const [members, setMembers] = useState([]);
@@ -176,7 +176,7 @@ export default function MemberList(props) {
       disableColumnMenu: true,
       width: 160,
     },
-    {
+    enableAttendance ? {
       field: 'attendanceAvg',
       headerName: 'A %',
       description: 'Average attendance percentage',
@@ -197,8 +197,8 @@ export default function MemberList(props) {
           </span>
         );
       },
-    },
-    {
+    } : {},
+    enableCapacity ? {
       field: 'capacityAvg',
       headerName: 'Capacity',
       description: 'Capacity of member at last entry',
@@ -211,8 +211,8 @@ export default function MemberList(props) {
 
         return (<Box style={{ backgroundColor: colour }} className={classes.capacityIndicator} />);
       },
-    },
-    {
+    } : {},
+    enableAttendance ? {
       field: 'meetingsAttended',
       headerName: 'Meetings Attended',
       description: 'Meetings attended by member',
@@ -228,22 +228,24 @@ export default function MemberList(props) {
           {params.row.nShouldAttend}
         </Box>
       ),
-    },
+    } : {},
     {
       field: 'options',
       headerName: 'Options',
       sortable: false,
       disableColumnMenu: true,
-      width: 120,
+      width: enableEditing ? 120 : 100,
       headerAlign: 'center',
       renderCell: (params) => (
         <Box className={classes.optionIconContainer}>
           <IconButton onClick={() => handleViewMember(params.row.id)}><VisibilityIcon /></IconButton>
-          <Divider orientation="vertical" flexItem />
+          {enableEditing ? <>
+            <Divider orientation="vertical" flexItem />
 
-          <Link to={`/members/add?memberId=${params.row.id}`}>
-            <IconButton><EditIcon /></IconButton>
-          </Link>
+            <Link to={`/members/add?memberId=${params.row.id}`}>
+              <IconButton><EditIcon /></IconButton>
+            </Link>
+          </> : null}
         </Box>
       ),
     },
@@ -287,12 +289,12 @@ export default function MemberList(props) {
 
         <Grid item xs={10} lg={6}>
           <Grid container spacing={2}>
-            <Grid item xs={12}>
+            {enableAttendance ? <Grid item xs={12}>
               {attendanceGraphDom}
-            </Grid>
-            <Grid item xs={12}>
+            </Grid> : null}
+            {enableCapacity ? <Grid item xs={12}>
               {capacityGraphDom}
-            </Grid>
+            </Grid> : null}
           </Grid>
         </Grid>
       </Grid>

@@ -9,6 +9,7 @@ import HomePage from './pages/HomePage';
 import NavButton from '../components/navigation/NavButton';
 import DevelopmentDashboardPage from './pages/DevelopmentDashboardPage';
 import RestrictedPage from './pages/RestrictedPage';
+import HauoraPage from './pages/HauoraPage';
 
 const useStyles = makeStyles((theme) => ({
   navContainer: {
@@ -44,6 +45,7 @@ export default function MainRouter() {
           <Route exact path="/events/:operation?" component={EventPage} />
           <Route path="/members/:operation?" component={MemberPage} />
           <Route path="/attendance" component={AttendancePage} />
+          <Route path="/hauora" component={HauoraPage} />
           <Route path="/dev-dashboard" component={DevelopmentDashboardPage} />
         </RestrictedPage>
 
