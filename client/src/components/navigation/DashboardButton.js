@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export default function DashboardButton({ action, link, text, visible }) {
+export default function DashboardButton({ action, link, text, visible = true }) {
   const classes = useStyles();
 
   const color = link ? 'primary' : 'secondary';
