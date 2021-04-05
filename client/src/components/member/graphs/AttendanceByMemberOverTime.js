@@ -6,6 +6,7 @@ import {
 import PropTypes from 'prop-types';
 import DisplayPaper from '../../wrappers/DisplayPaper';
 import Plot from '../../wrappers/Plot';
+import { red } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme) => ({
   legend: {
@@ -27,17 +28,26 @@ function AttendanceByMemberOverTime({ meetingData, memberName, height }) {
   meetingData = meetingData.sort((a, b) => (a.x < b.x ? 1 : -1));
 
   const yPercent = 70;
-  const line = [];
+  const yPercentRed = 50;
+
+  const line1 = [];
+  const line2 = [];
+
   if (meetingData.length) {
-    line.push({ x: meetingData[0].x, y: yPercent });
-    line.push({ x: meetingData[meetingData.length - 1].x, y: yPercent });
+    line1.push({ x: meetingData[0].x, y: yPercent });
+    line1.push({ x: meetingData[meetingData.length - 1].x, y: yPercent });
+
+    line2.push({ x: meetingData[0].x, y: yPercentRed })
+    line2.push({ x: meetingData[meetingData.length - 1].x, y: yPercentRed })
   }
 
   return (
     <Plot height={height} plotTitle={`${memberName}'s attendance over time`}>
 
       <LineSeries data={meetingData} style={{ strokeWidth: 2 }} />
-      <LineSeries data={line} style={{ strokeWidth: 1, strokeDasharray: [2, 5], stroke: '#333' }} strokeStyle="dashed" />
+      <LineSeries data={line1} style={{ strokeWidth: 1, strokeDasharray: [2, 5], stroke: '#333' }} />
+      <LineSeries data={line2} style={{ strokeWidth: 1, stroke: red[500] }} />
+
 
       <XAxis title="Time" position="middle" />
       <YAxis title="Attendance %" position="middle" />
