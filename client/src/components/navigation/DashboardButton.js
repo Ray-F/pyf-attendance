@@ -16,24 +16,27 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export default function DashboardButton(props) {
+export default function DashboardButton({ action, link, text, visible }) {
   const classes = useStyles();
-  const history = useHistory();
 
-  const color = props.link ? 'primary' : 'secondary';
+  const color = link ? 'primary' : 'secondary';
 
-  if (props.link) {
+  if (!visible) {
+    return null;
+  }
+
+  if (link) {
     return (
       <Grid item xs={6} sm={4}>
-        <Link to={props.link} className={classes.link}>
-          <Button className={classes.actionButton} variant="outlined" color={color}>{props.text}</Button>
+        <Link to={link} className={classes.link}>
+          <Button className={classes.actionButton} variant="outlined" color={color}>{text}</Button>
         </Link>
       </Grid>
     );
-  } if (props.action) {
+  } if (action) {
     return (
       <Grid item xs={6} sm={4}>
-        <Button className={classes.actionButton} onClick={() => props.action()} variant="outlined" color={color}>{props.text}</Button>
+        <Button className={classes.actionButton} onClick={() => action()} variant="outlined" color={color}>{text}</Button>
       </Grid>
     );
   }
