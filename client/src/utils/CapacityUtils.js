@@ -8,6 +8,18 @@ const colourYellow = amber[500];
 const colourGreen = green[500];
 const colourGrey = grey[300];
 
+export class CapacityView {
+
+  numberReds;
+  numberOranges;
+
+  constructor(numberReds = 1, numberOranges = 3) {
+    this.numberReds = numberReds;
+    this.numberOranges = numberOranges;
+  }
+
+}
+
 export function getCapacityColour(capacityLevel) {
   let colour;
 

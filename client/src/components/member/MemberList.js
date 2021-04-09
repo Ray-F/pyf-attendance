@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Box, Container, Divider, Grid, Hidden, IconButton, makeStyles,
+  Box, Container, Divider, Grid, Hidden, IconButton, makeStyles, Tooltip,
 } from '@material-ui/core';
 import { DataGrid } from '@material-ui/data-grid';
 import VisibilityIcon from '@material-ui/icons/Visibility';
@@ -10,6 +10,7 @@ import { getAttendanceColour, getCapacityColour } from '../../utils/CapacityUtil
 import AttendanceByMemberOverTime from './graphs/AttendanceByMemberOverTime';
 import CapacityByMemberOverTime from './graphs/CapacityByMemberOverTime';
 import DisplayPaper from '../wrappers/DisplayPaper';
+import { red } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -33,6 +34,12 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 15,
   },
 
+  checkInIndicator: {
+    fontStyle: 'italic',
+    color: red[700],
+    cursor: 'pointer',
+  },
+
   optionIconContainer: {
     margin: '0 0 0 -5px',
     display: 'flex',
@@ -43,7 +50,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function MemberList({ enableAttendance = true, enableCapacity = true, enableEditing = true }) {
+/**
+ * @param enableAttendance
+ * @param enableCapacity
+ * @param enableEditing
+ * @param {CapacityView?} highlightCapacity
+ */
+export default function MemberList({ enableAttendance = true,
+                                     enableCapacity = true,
+                                     enableEditing = true,
+                                     highlightCapacity = null }) {
   const classes = useStyles();
 
   const [members, setMembers] = useState([]);
@@ -72,6 +88,9 @@ export default function MemberList({ enableAttendance = true, enableCapacity = t
 
           const membersWithAttendance = membersData.map((member) => {
             // Get all attendance records for the member
+            /**
+             * @type {Array}
+             */
             const attendanceRecords = attendanceDataWithDate.filter((attendance) => attendance.memberId === member._id && attendance.eventType === 'Meeting')
               .sort((a, b) => (a.date > b.date ? -1 : 1));
 
@@ -87,6 +106,34 @@ export default function MemberList({ enableAttendance = true, enableCapacity = t
             member.nShouldAttend = nShouldAttend;
             member.attendanceAvg = 0;
             member.meetingsAttended = 0;
+            member.highlightForCheckIn = false;
+
+            // If a highlightCapacity rules was passed, use this to determine which members to highlight
+            if (highlightCapacity) {
+              const capacities = {
+                4: { count: 0, rule: highlightCapacity.numberReds },
+                3: { count: 0, rule: highlightCapacity.numberOranges },
+              }
+
+              for (const key in capacities) {
+                let current = 0, iterator = attendanceRecords.values();
+
+                while (current < capacities[key].rule) {
+                  let currentRecord = iterator.next().value;
+
+                  if (!currentRecord.isAbsent) {
+                    if (currentRecord.capacity >= key) capacities[key].count++;
+                    current++;
+                  }
+                }
+              }
+
+              for (const key in capacities) {
+                if (capacities[key].count >= capacities[key].rule) {
+                  member.highlightForCheckIn = true;
+                }
+              }
+            }
 
             attendanceRecords.forEach((attendance) => {
               if (!attendance.isAbsent) {
@@ -175,6 +222,16 @@ export default function MemberList({ enableAttendance = true, enableCapacity = t
       sortable: true,
       disableColumnMenu: true,
       width: 160,
+      renderCell: (params) => {
+        if (params.row.highlightForCheckIn) {
+          return (
+            <Tooltip title={"Check in required"} placement={"left"} arrow>
+              <span className={classes.checkInIndicator}>
+                {params.row.name}
+              </span>
+            </Tooltip>);
+        }
+      }
     },
     enableAttendance ? {
       field: 'attendanceAvg',
@@ -258,6 +315,7 @@ export default function MemberList({ enableAttendance = true, enableCapacity = t
     capacityAvg: member.capacityAvg,
     meetingsAttended: member.meetingsAttended,
     nShouldAttend: member.nShouldAttend,
+    highlightForCheckIn: member.highlightForCheckIn,
   })).sort((a, b) => a.name.localeCompare(b.name));
 
   return (

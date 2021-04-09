@@ -4,6 +4,7 @@ import { useLocation } from 'react-router';
 import MemberForm from '../../components/member/MemberForm';
 import DisplayPaper from '../../components/wrappers/DisplayPaper';
 import MemberList from '../../components/member/MemberList';
+import { CapacityView } from '../../utils/CapacityUtils';
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -23,6 +24,12 @@ export default function HauoraPage(props) {
     case 'delete': return <DisplayPaper formTitle="Delete member" />;
     case 'list':
     default:
-      return <MemberList enableAttendance={false} enableCapacity={true} enableEditing={false} />;
+      return (
+        <MemberList
+          enableAttendance={false}
+          enableCapacity={true}
+          enableEditing={false}
+          highlightCapacity={new CapacityView(1, 2)}
+        />);
   }
 }
