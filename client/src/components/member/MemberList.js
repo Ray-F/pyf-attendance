@@ -251,9 +251,9 @@ export default function MemberList ({
   )
   
   const attendanceAbsencesDom = !meetingAttendanceXY ? null : (
-    <p>For {Math.round(
-        activeMember.meetingsExcused / activeMember.meetingsAbsent * 100 *
-        10) / 10}% of meetings they missed, they were excused. ({activeMember.meetingsExcused}/{activeMember.meetingsAbsent})</p>
+    <p>For {
+      activeMember.meetingsAbsent ? (Math.round(activeMember.meetingsExcused / activeMember.meetingsAbsent * 100 * 10) / 10) : '100'}
+        % of meetings they missed, they were excused. ({activeMember.meetingsExcused}/{activeMember.meetingsAbsent})</p>
   )
   
   const handleViewMember = (memberId) => {
