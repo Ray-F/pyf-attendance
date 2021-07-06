@@ -1,5 +1,59 @@
 import { AttendanceDboMapper } from '../infrastructure/mapper/AttendanceMapper';
 
+interface AttendanceProps {
+
+  /**
+   * The ID of the attendance object.
+   */
+  id?: string,
+
+  /**
+   * The ID of the member who this attendance belongs to.
+   */
+  memberId: string,
+
+  /**
+   * The full name of the member who this attendance belongs to.
+   */
+  fullName: string,
+
+  /**
+   * The ID of the event who this attendance is for.
+   */
+  eventId: string,
+
+  /**
+   * The type of event this attendance is for.
+   */
+  eventType: string,
+
+  /**
+   * If member was late to arrive or early to leave.
+   */
+  isLate: boolean,
+
+  /**
+   * If member was absent.
+   */
+  isAbsent: boolean,
+
+  /**
+   * If member was excused.
+   */
+  isExcused: boolean,
+
+  /**
+   * The excuse reason if they were excused.
+   */
+  excuseReason: string,
+
+  /**
+   * The capacity of the member if applicable.
+   */
+  capacity: number
+
+}
+
 class Attendance {
 
   id: string;
@@ -17,28 +71,18 @@ class Attendance {
 
   capacity: number;
 
-  /**
-   * @param id The ID of the attendance object.
-   * @param memberId The ID of the member who this attendance belongs to.
-   * @param fullName The full name of the member who this attendance belongs to.
-   * @param eventId The ID of the event who this attendance is for.
-   * @param eventType The type of event this attendance is for.
-   * @param isLate If member was late to arrive or early to leave.
-   * @param isAbsent If member was absent.
-   * @param isExcused If member was excused.
-   * @param excuseReason The excuse reason if they were excused.
-   * @param capacity The capacity of the member if applicable.
-   */
-  constructor(id: string = null,
-              memberId: string,
-              fullName: string,
-              eventId: string,
-              eventType: string,
-              isLate: boolean,
-              isAbsent: boolean,
-              isExcused: boolean,
-              excuseReason: string,
-              capacity: number) {
+  constructor({
+                id = null,
+                memberId,
+                fullName,
+                eventId,
+                eventType,
+                isLate,
+                isAbsent,
+                isExcused,
+                excuseReason,
+                capacity,
+              }: AttendanceProps) {
     this.id = id;
     this.memberId = memberId;
     this.fullName = fullName;
@@ -92,4 +136,4 @@ class Attendance {
 
 export {
   Attendance,
-}
+};

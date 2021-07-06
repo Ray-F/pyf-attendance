@@ -56,17 +56,19 @@ const generateNewAttendanceRecords = async (event) => {
       return (eventDate >= member.startDate);
     }
   }).map((member) => new Attendance(
-    undefined,
-    member.id,
-    member.fullName,
-    event.id,
-    event.type,
-    false,
-    false,
-    false,
-    '',
-    0,
-  ));
+    {
+      memberId: member.id,
+      fullName: member.fullName,
+      eventId: event.id,
+      eventType: event.type,
+      isLate: false,
+      isAbsent: false,
+      isExcused: false,
+      excuseReason: '',
+      capacity: 1,
+    },
+  ))
+    ;
 };
 
 /**
@@ -86,16 +88,18 @@ const generateNewAttendanceRecords = async (event) => {
  */
 const saveAttendance = async (req, res, next) => {
   const records = req.body.map(record => new Attendance(
-    record.id,
-    record.memberId,
-    record.fullName,
-    record.eventId,
-    record.eventType,
-    record.isShort,
-    record.isAbsent,
-    record.isExcused,
-    record.excuseReason,
-    record.capacity
+    {
+      id: record.id,
+      memberId: record.memberId,
+      fullName: record.fullName,
+      eventId: record.eventId,
+      eventType: record.eventType,
+      isAbsent: record.isAbsent,
+      isExcused: record.isExcused,
+      isLate: record.isShort,
+      excuseReason: record.excuseReason,
+      capacity: record.capacity,
+    },
   ));
   const eventId = req.body[0].eventId;
   const eventObject = await getEventFromDb(eventId);

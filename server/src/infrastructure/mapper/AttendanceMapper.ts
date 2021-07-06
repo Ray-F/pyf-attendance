@@ -27,16 +27,19 @@ interface AttendanceDbo extends Dbo {
 class AttendanceDboMapper implements IDboMapper<Attendance> {
 
   fromDbo(dbo: AttendanceDbo): Attendance {
-    return new Attendance(String(dbo._id),
-                          String(dbo.member.memberId),
-                          dbo.member.fullName,
-                          String(dbo.event.eventId),
-                          dbo.event.type,
-                          dbo.isLate,
-                          dbo.isAbsent,
-                          dbo.isExcused,
-                          dbo.excuseReason,
-                          dbo.capacity);
+    return new Attendance(
+      {
+        id: String(dbo._id),
+        memberId: String(dbo.member.memberId),
+        fullName: dbo.member.fullName,
+        eventId: String(dbo.event.eventId),
+        eventType: dbo.event.type,
+        isLate: dbo.isLate,
+        isAbsent: dbo.isAbsent,
+        isExcused: dbo.isExcused,
+        excuseReason: dbo.excuseReason,
+        capacity: dbo.capacity,
+      });
   }
 
   toDbo(attendance: Attendance): AttendanceDbo {
