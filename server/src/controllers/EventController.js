@@ -68,7 +68,11 @@ const getEventDashboardList = async (req, res, next) => {
  * @param {boolean} req.body.hasAttendanceRecords - If the event has existing attendance records.
  */
 const saveEvent = async (req, res, next) => {
-  await saveEventToDb(new Event(req.body._id, req.body.title, req.body.type, new Date(req.body.date), req.body.hasAttendanceRecords));
+  await saveEventToDb(new Event(req.body._id,
+                                req.body.title,
+                                req.body.type,
+                                new Date(req.body.date),
+                                req.body.hasAttendanceRecords));
   res.sendStatus(200);
 };
 

@@ -2,7 +2,7 @@ import {
   deleteAllAttendanceFromDb, deleteAttendanceFromDb, getAttendanceFromDb, getEventFromDb, getMembersFromDb,
   saveAttendanceToDb, setEventRecorded,
 } from '../infrastructure/repository/MongoRepository';
-import Attendance from '../models/Attendance';
+import { Attendance } from '../models/Attendance';
 
 
 /**
@@ -56,17 +56,16 @@ const generateNewAttendanceRecords = async (event) => {
       return (eventDate >= member.startDate);
     }
   }).map((member) => new Attendance(
-    {
-      memberId: member.id,
-      fullName: member.fullName,
-      eventId: event.id,
-      eventType: event.type,
-      isLate: false,
-      isAbsent: false,
-      isExcused: false,
-      excuseReason: '',
-      capacity: 0,
-    },
+    undefined,
+    member.id,
+    member.fullName,
+    event.id,
+    event.type,
+    false,
+    false,
+    false,
+    '',
+    0,
   ));
 };
 
@@ -81,24 +80,22 @@ const generateNewAttendanceRecords = async (event) => {
  * @param {string} req.body[].eventType - The type of event.
  * @param {boolean} req.body[].isAbsent - If the member was absent at the event.
  * @param {boolean} req.body[].isExcused - If the member was excused for being absent/late.
- * @param {boolean} req.body[].isLate - If the member left early or was late to the event.
+ * @param {boolean} req.body[].isShort - If the member left early or was late to the event.
  * @param {string} req.body[].excuseReason - An excuse reason (empty string if not applicable).
  * @param {number} req.body[].capacity - The capacity level of the member (if applicable).
  */
 const saveAttendance = async (req, res, next) => {
   const records = req.body.map(record => new Attendance(
-    {
-      id: record.id,
-      memberId: record.memberId,
-      fullName: record.fullName,
-      eventId: record.eventId,
-      eventType: record.eventType,
-      isAbsent: record.isAbsent,
-      isExcused: record.isExcused,
-      isLate: record.isShort,
-      excuseReason: record.excuseReason,
-      capacity: record.capacity,
-    },
+    record.id,
+    record.memberId,
+    record.fullName,
+    record.eventId,
+    record.eventType,
+    record.isShort,
+    record.isAbsent,
+    record.isExcused,
+    record.excuseReason,
+    record.capacity
   ));
   const eventId = req.body[0].eventId;
   const eventObject = await getEventFromDb(eventId);

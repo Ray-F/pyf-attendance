@@ -29,7 +29,7 @@ class Attendance {
    * @param excuseReason The excuse reason if they were excused.
    * @param capacity The capacity of the member if applicable.
    */
-  constructor(id: string,
+  constructor(id: string = null,
               memberId: string,
               fullName: string,
               eventId: string,

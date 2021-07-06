@@ -45,4 +45,6 @@ class Member {
 }
 
 
-export default Member;
+export {
+  Member
+};

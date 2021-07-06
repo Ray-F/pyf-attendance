@@ -1,5 +1,5 @@
 import { IDboMapper } from '../../domain/common/IDboMapper';
-import Member from '../../models/Member';
+import { Member } from '../../models/Member';
 import { ObjectId } from 'mongodb';
 
 interface MemberDbo {

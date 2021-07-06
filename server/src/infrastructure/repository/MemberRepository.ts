@@ -1,6 +1,6 @@
 import { IRepository } from '../../domain/common/Repository';
 import { MemberDboMapper } from '../mapper/MemberMapper';
-import Member from '../../models/Member';
+import { Member } from '../../models/Member';
 import { MongoAdapter } from '../mapper/MongoAdapter';
 import { Collection, ObjectId } from 'mongodb';
 import { AttendanceRepository } from './AttendanceRepository';

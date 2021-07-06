@@ -2,7 +2,7 @@ import {
   deleteAllAttendanceFromDb, deleteAttendanceFromDb, deleteAllMembersFromDb, deleteMemberFromDb, getMemberFromDb,
   getMembersFromDb, saveMemberToDb,
 } from '../infrastructure/repository/MongoRepository';
-import Member from '../models/Member';
+import { Member } from '../models/Member';
 
 /**
  * Gets all members or a single member (if `req.query.memberId` is specified).
@@ -24,7 +24,10 @@ const getMembers = async (req, res, next) => {
  * @param {string} [req.body.endDate] - The ending date of the member.
  */
 const saveMember = async (req, res, next) => {
-  await saveMemberToDb(new Member(req.body._id, req.body.fullName, new Date(req.body.startDate), req.body.endDate ? new Date(req.body.endDate) : undefined));
+  await saveMemberToDb(new Member(req.body._id,
+                                  req.body.fullName,
+                                  new Date(req.body.startDate),
+                                  req.body.endDate ? new Date(req.body.endDate) : undefined));
   res.sendStatus(200);
 };
 
