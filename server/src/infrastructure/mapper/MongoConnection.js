@@ -19,7 +19,7 @@ client.connect(err => {
     );
     const dbName = client.s.options.dbName;
 
-    console.info(`[SERVER] MongoDB connected with user ${username.yellow} on ${dbName.yellow}`);
+    console.info(`[SERVER] MongoDB connected with user ${username} on ${dbName}`);
   }
 });
 

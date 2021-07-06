@@ -1,0 +1,7 @@
+interface Dbo {
+}
+
+
+export {
+  Dbo,
+};

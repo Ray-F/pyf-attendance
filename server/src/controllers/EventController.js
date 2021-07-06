@@ -1,8 +1,8 @@
 import {
   deleteAllAttendanceFromDb, deleteAllEventsFromDb, deleteAttendanceFromDb, deleteEventFromDb, getEventFromDb,
   getEventsFromDb, saveEventToDb,
-} from '../models/mongodb/MongoRepository';
-import Event from '../models/Event';
+} from '../infrastructure/repository/MongoRepository';
+import { Event } from '../models/Event';
 
 /**
  * Gets all events or a single event if an `eventId` is passed.
@@ -68,7 +68,7 @@ const getEventDashboardList = async (req, res, next) => {
  * @param {boolean} req.body.hasAttendanceRecords - If the event has existing attendance records.
  */
 const saveEvent = async (req, res, next) => {
-  await saveEventToDb(new Event(req.body));
+  await saveEventToDb(new Event(req.body._id, req.body.title, req.body.type, new Date(req.body.date), req.body.hasAttendanceRecords));
   res.sendStatus(200);
 };
 

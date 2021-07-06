@@ -1,7 +1,7 @@
 import {
   deleteAllAttendanceFromDb, deleteAttendanceFromDb, getAttendanceFromDb, getEventFromDb, getMembersFromDb,
   saveAttendanceToDb, setEventRecorded,
-} from '../models/mongodb/MongoRepository';
+} from '../infrastructure/repository/MongoRepository';
 import Attendance from '../models/Attendance';
 
 
@@ -65,7 +65,7 @@ const generateNewAttendanceRecords = async (event) => {
       isAbsent: false,
       isExcused: false,
       excuseReason: '',
-      capacity: 1,
+      capacity: 0,
     },
   ));
 };

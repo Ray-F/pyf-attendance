@@ -1,9 +1,15 @@
-import mongoClient from './MongoConnection';
+import mongoClient from '../mapper/MongoConnection';
 import { ObjectId } from 'mongodb';
-import config from '../../utils/Config';
-import Attendance from '../Attendance';
-import Member from '../Member';
-import Event from '../Event';
+import Config from '../../utils/Config';
+import { Attendance } from '../../models/Attendance';
+import { Event } from '../../models/Event';
+import { MemberDboMapper } from '../mapper/MemberMapper';
+import { EventDboMapper } from '../mapper/EventMapper';
+import { AttendanceDboMapper } from '../mapper/AttendanceMapper';
+
+const eventDboMapper = new EventDboMapper();
+const memberDboMapper = new MemberDboMapper();
+const attendanceDboMapper = new AttendanceDboMapper();
 
 /**
  * Returns the collection instance for `collectionName`.
@@ -17,9 +23,9 @@ const getCollection = (collection) => {
     case 'events':
     case 'attendance':
     case 'users':
-      return mongoClient.db(config.DB_NAME).collection(collection);
+      return mongoClient.db(Config.DB_NAME).collection(collection);
     default:
-      throw new Error(`No collection "${collection}" found on "${config.DB_NAME}"`);
+      throw new Error(`No collection "${collection}" found on "${Config.DB_NAME}"`);
   }
 };
 
@@ -30,13 +36,7 @@ const getCollection = (collection) => {
  */
 const getMembersFromDb = async () => {
   return (await getCollection('members').find({}).toArray())
-    .map((member) => new Member(
-      {
-        id: member._id,
-        fullName: member.fullName,
-        startDate: member.startDate,
-        endDate: member.endDate,
-      }));
+    .map((member) => memberDboMapper.fromDbo(member));
 };
 
 /**
@@ -46,8 +46,8 @@ const getMembersFromDb = async () => {
  * @returns {Promise<Member>}
  */
 const getMemberFromDb = async (memberId) => {
-  const mongoMember = await getCollection('members').findOne({ '_id': ObjectId(memberId) });
-  return new Member(mongoMember);
+  const mongoMember = await getCollection('members').findOne({ '_id': new ObjectId(memberId) });
+  return memberDboMapper.fromDbo(mongoMember);
 };
 
 /**
@@ -81,7 +81,7 @@ const saveMemberToDb = async (member) => {
 const deleteMemberFromDb = async (memberId) => {
   const query = {
     '_id': {
-      $eq: ObjectId(memberId),
+      $eq: new ObjectId(memberId),
     },
   };
 
@@ -104,7 +104,7 @@ const deleteAllMembersFromDb = async () => {
  */
 const getEventsFromDb = async () => {
   return (await getCollection('events').find({}).toArray())
-    .map((event) => new Event(event));
+    .map((event) => eventDboMapper.fromDbo(event));
 };
 
 /**
@@ -114,8 +114,8 @@ const getEventsFromDb = async () => {
  * @returns {Promise<Event>}
  */
 const getEventFromDb = async (eventId) => {
-  const mongoEvent = await getCollection('events').findOne({ '_id': ObjectId(eventId) });
-  return (new Event(mongoEvent));
+  const mongoEvent = await getCollection('events').findOne({ '_id': new ObjectId(eventId) });
+  return eventDboMapper.fromDbo(mongoEvent);
 };
 
 /**
@@ -146,7 +146,7 @@ const saveEventToDb = async (event) => {
 const deleteEventFromDb = async (eventId) => {
   const query = {
     '_id': {
-      $eq: ObjectId(eventId),
+      $eq: new ObjectId(eventId),
     },
   };
 
@@ -175,7 +175,7 @@ const setEventRecorded = async (eventId = null, recorded = true) => {
   };
 
   if (eventId) {
-    const filter = { _id: ObjectId(eventId) };
+    const filter = { _id: new ObjectId(eventId) };
     return await getCollection('events').updateOne(filter, query);
   }
 
@@ -193,32 +193,19 @@ const getAttendanceFromDb = async (eventId = null, memberId = null) => {
   let attendanceDboObjects;
   if (eventId) {
     attendanceDboObjects = await getCollection('attendance')
-      .find({ 'event.eventId': ObjectId(eventId) })
+      .find({ 'event.eventId': new ObjectId(eventId) })
       .sort({ '_id': -1 })
       .toArray();
   } else if (memberId) {
     attendanceDboObjects = await getCollection('attendance')
-      .find({ 'member.memberId': ObjectId(memberId) })
+      .find({ 'member.memberId': new ObjectId(memberId) })
       .sort({ '_id': -1 })
       .toArray();
   } else {
     attendanceDboObjects = await getCollection('attendance').find({}).sort({ '_id': -1 }).toArray();
   }
 
-  return attendanceDboObjects.map((dboObject) => new Attendance(
-    {
-      id: dboObject._id.toString(),
-      memberId: dboObject.member.memberId.toString(),
-      fullName: dboObject.member.fullName,
-      eventId: dboObject.event.eventId.toString(),
-      eventType: dboObject.event.type,
-      isLate: (dboObject.isLate === 'true' || dboObject.isLate === true),
-      isAbsent: (dboObject.isAbsent === 'true' || dboObject.isAbsent === true),
-      isExcused: (dboObject.isExcused === 'true' || dboObject.isExcused === true),
-      excuseReason: dboObject.excuseReason,
-      capacity: dboObject.capacity,
-    },
-  ));
+  return attendanceDboObjects.map((dboObject) => attendanceDboMapper.fromDbo(dboObject));
 };
 
 /**
@@ -243,13 +230,13 @@ const deleteAttendanceFromDb = async (eventId = null, memberId = null) => {
   if (eventId) {
     query = {
       'event.eventId': {
-        $eq: ObjectId(eventId),
+        $eq: new ObjectId(eventId),
       },
     };
   } else if (memberId) {
     query = {
       'member.memberId': {
-        $eq: ObjectId(memberId),
+        $eq: new ObjectId(memberId),
       },
     };
   } else {

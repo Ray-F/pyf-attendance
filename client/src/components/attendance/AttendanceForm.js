@@ -36,6 +36,19 @@ const useStyles = makeStyles((theme) => ({
   },
 
   slider: {
+    '&[data-capacity="0"]': {
+      '& .MuiSlider-rail': {
+        backgroundColor: '#373737',
+      },
+
+      '& .MuiSlider-track': {
+        backgroundColor: '#373737',
+      },
+ 
+      '& .MuiSlider-thumb': {
+        display: 'none',
+      },
+    },
     '&[data-capacity="4"]': {
       '& .MuiSlider-rail': {
         backgroundColor: red[500],
@@ -317,7 +330,7 @@ export default function AttendanceForm(props) {
           <Slider
             className={classes.slider}
             onChangeCommitted={(e, value) => handleCapacityChange(value, params)}
-            disabled={params.getValue('isAbsent')}
+            disabled={params.row.isAbsent}
             step={1}
             min={1}
             max={4}

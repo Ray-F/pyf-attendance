@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import config from '../utils/Config';
 import shell from 'shelljs';
-import { getUserByEmailFromDb } from '../models/mongodb/MongoRepository';
+import { getUserByEmailFromDb } from '../infrastructure/repository/MongoRepository';
 
 /**
  * Automatically deploys the latest changes to the web server. This function will only return 200 success if run

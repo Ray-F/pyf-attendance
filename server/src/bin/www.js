@@ -1,16 +1,21 @@
 import config from '../utils/Config';
-import 'colors';
+import chalk from 'chalk';
 import { version } from '../../package.json';
 import app from '../app';
 import debug from 'debug';
 import http from 'http';
+import { Logger } from '../utils/Logger';
 
 // Get port from environment file
 const port = normalizePort(config.PORT);
 app.set('port', port);
-console.log(`\n[SERVER] ${config.ENV.bold} server hosted on port:`, port.toString().yellow);
-console.log('[SERVER] CI set to:', (config.CI_BUILD).toString().yellow);
-console.log('[SERVER] Running application version:', version.yellow, '\n');
+
+const logger = Logger.getInstance();
+
+
+logger.logInfo(`${chalk.bold(config.ENV)} server hosted on port: ${chalk.yellow(port)}`);
+logger.logInfo(`CI set to: ${chalk.yellow(config.CI_BUILD)}`);
+logger.logInfo(`Running application version: ${chalk.yellow(version)}\n`);
 
 // Create the HTTP server and set function actions when events happen
 const server = http.createServer(app);
